@@ -1,0 +1,26 @@
+@import "./base.css";
+
+#app {
+  /* max-width: 1280px; */
+  /* margin: 0 auto; */
+  /* padding: 2rem; */
+
+  /* font-weight: normal; */
+}
+
+p {
+  padding-bottom: 10px;
+  text-indent: 20px;
+}
+
+.table-label {
+  font-size:large;
+  color: #888;
+  /* font-weight: 500; */
+}
+
+.left-title {
+  width: 30px;
+  writing-mode: vertical-lr;
+  transform:scale(-1);
+}
