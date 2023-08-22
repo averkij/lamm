@@ -1,0 +1,2 @@
+DATA_FOLDER = "data"
+DB_VERSION = "0.1"
