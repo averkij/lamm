@@ -20,6 +20,13 @@ def create_folders(hash):
         )
 
 
+def check_data(items_1, items_2):
+    """Check SBS data"""
+    assert len(items_1) == len(items_2)
+
+    # TODO add additional data
+
+
 def try_parse_int(value):
     """Try parse int"""
     try:

@@ -9,13 +9,14 @@ import uuid
 import config
 import constants as con
 import db_helper
-import misc
+import helper
+import json
 
 from flask import Flask, abort, request, send_file
 from flask_cors import CORS
 
 
-misc.configure_logging()
+helper.configure_logging()
 
 # - /sbs/create
 # - /sbs/list
@@ -33,12 +34,18 @@ CORS(app)
 def sbs_create():
     """Upload data and create sbs object"""
 
-    print(request.files)
+    print(request.form)
+
+    sbs_name = request.form.get("name", "SBS")
+    model_name_1 = request.form.get("model_1", "model_1")
+    model_name_2 = request.form.get("model_2", "model_2")
+    filename_1 = request.form["filename_1"]
+    filename_2 = request.form["filename_2"]
 
     sbs_guid = uuid.uuid4().hex
 
     upload_folder = os.path.join(con.DATA_FOLDER, sbs_guid)
-    misc.check_folder(upload_folder)
+    helper.check_folder(upload_folder)
 
     for model in request.files:
         file = request.files[model]
@@ -48,14 +55,28 @@ def sbs_create():
         logging.info(f"Loading document {file.filename}.")
         upload_path = os.path.join(upload_folder, filename)
 
-        print(file)
-
-        print(upload_path)
+        # print(file)
+        # print(upload_path)
 
         file.save(upload_path)
 
         logging.info(f"Success. {filename} is loaded.")
-    return ("", 200)
+
+    with open(
+        os.path.join(upload_folder, filename_1), mode="r", encoding="utf-8"
+    ) as file_1:
+        with open(
+            os.path.join(upload_folder, filename_2), mode="r", encoding="utf-8"
+        ) as file_2:
+            items_1 = json.load(file_1)
+            items_2 = json.load(file_2)
+
+    helper.check_data(items_1, items_2)
+
+    db_helper.create_db(sbs_guid, sbs_name, model_name_1, model_name_2)
+    db_helper.fill_db(sbs_guid, items_1, items_2)
+
+    return {"id": sbs_guid}
 
 
 @app.route("/sbs/list", methods=["GET"])
