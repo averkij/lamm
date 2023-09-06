@@ -11,6 +11,8 @@ import helper
 def create_db(sbs_guid, sbs_name, model_name_1, model_name_2):
     """Init SBS database"""
     db_path = helper.get_sbs_path(sbs_guid)
+    curr_time = helper.get_curr_time()
+
     if not os.path.isfile(db_path):
         logging.info(f"Creating SBS db: {db_path}")
         with sqlite3.connect(db_path) as db:
@@ -40,7 +42,8 @@ def create_db(sbs_guid, sbs_name, model_name_1, model_name_2):
                         id integer primary key,
                         task_id integer NOT NULL,
                         user_id integer NOT NULL,
-                        type int default 0 NOT NULL
+                        event_id int default 0 NOT NULL,
+                        insert_ts text
                        )"""
             )
             db.execute("create table version(id integer primary key, version text)")
@@ -53,7 +56,7 @@ def create_db(sbs_guid, sbs_name, model_name_1, model_name_2):
                     model_name_1,
                     model_name_2,
                     0,
-                    datetime.datetime.utcnow().strftime("%Y-%m-%d_%H:%M:%S"),
+                    curr_time,
                 ),
             )
             db.execute("insert into version(version) values (?)", (con.DB_VERSION,))
@@ -93,6 +96,8 @@ def ensure_user_exists(sbs_guid, user_guid):
 def get_tasks(sbs_guid, user_guid, n=1):
     """Get tasks for SBS"""
     db_path = helper.get_sbs_path(sbs_guid)
+    curr_time = helper.get_curr_time()
+
     with sqlite3.connect(db_path) as db:
         # get tasks
         tasks = db.execute(
@@ -108,22 +113,11 @@ def get_tasks(sbs_guid, user_guid, n=1):
 
         task_ids = [x[0] for x in tasks]
 
-        logging.info(f"Get {n} tasks. Ids:{', '.join(task_ids)}")
-
-        # update get count for user
-        db.execute(
-            f"""update users
-                set
-                    get_count = get_count + ?
-                where
-                    guid = ?
-                    """,
-            (len(tasks), user_guid),
-        )
+        logging.info(f"Get {n} tasks. Ids:{', '.join([str(x) for x in task_ids])}")
 
         # update get count for tasks (sort optimization)
         db.execute(
-            f"""update tasks
+            """update tasks
                 set
                     get_count = get_count + 1
                 where
@@ -135,10 +129,35 @@ def get_tasks(sbs_guid, user_guid, n=1):
 
         # update history
         db.executemany(
-            """insert into history (task_id, user_id, type) values (
-                    ?, (select u.id from users u where u.guid=?),?
+            """insert into history (task_id, user_id, event_id, insert_ts) values (
+                    ?, (select u.id from users u where u.guid=?),?,?
                 )""",
-            [(task_id, user_guid, con.TASK_GET) for task_id in task_ids],
+            [(task_id, user_guid, con.EVENT_GET, curr_time) for task_id in task_ids],
         )
 
-    return [(x[1], x[2], x[3], x[4], x[5]) for x in tasks]
+    return [(x[0], x[1], x[2], x[3], x[4], x[5]) for x in tasks]
+
+
+def resolve_task(sbs_guid, user_guid, task_id, event_id):
+    """Process user answer"""
+    db_path = helper.get_sbs_path(sbs_guid)
+    curr_time = helper.get_curr_time()
+
+    with sqlite3.connect(db_path) as db:
+        # update get count for tasks (sort optimization)
+        db.execute(
+            """update tasks
+                set
+                    answer_count = answer_count + 1
+                where
+                    id = ?""",
+            (task_id,),
+        )
+
+        # update history
+        db.execute(
+            """insert into history (task_id, user_id, event_id, insert_ts) values (
+                    ?, (select u.id from users u where u.guid=?),?,?
+                )""",
+            (task_id, user_guid, event_id, curr_time),
+        )

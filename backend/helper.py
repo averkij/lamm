@@ -5,6 +5,7 @@ import json
 from warnings import simplefilter
 import constants as con
 import sys
+import datetime
 
 
 def check_folder(folder):
@@ -18,6 +19,16 @@ def create_folders(hash):
         pathlib.Path(os.path.join(con.DATA_FOLDER, hash)).mkdir(
             parents=True, exist_ok=True
         )
+
+
+def get_curr_time():
+    """Get formatted time"""
+    return datetime.datetime.utcnow().strftime("%Y-%m-%d_%H:%M:%S")
+
+
+def get_sbs_path(guid):
+    """Get SBS DB path"""
+    return os.path.join(con.DATA_FOLDER, guid, f"{guid}.db")
 
 
 def check_data(items_1, items_2):
