@@ -7,8 +7,14 @@ export const SettingsHelper = {
     //     return localStorage.fontSizeLeft ? localStorage.fontSizeLeft : defaultClientSettings.fontSizeLeft;
     // },
     getUserId() {
-        return localStorage.userId ? localStorage.userId : uuidv4();
+        this.initUserId();
+        return localStorage.userId;
     },
+    initUserId() {
+        if (!localStorage.userId) {
+            localStorage.userId = uuidv4();
+        }
+    }
 }
 
 const defaultClientSettings = {}
