@@ -3,12 +3,8 @@ import {
 } from 'vuex'
 
 import {
-    SET_FONT_SIZE_LEFT,
-    SET_FONT_SIZE_RIGHT,
-    SET_LAYOUT_MODE,
-    SET_SHOW_TEXT_LEFT,
-    SET_SHOW_TEXT_RIGHT,
-    SET_COLOR_PROMPT,
+    SET_USER_ID,
+    SET_USER_NAME,
 } from "./mutations.type"
 
 import {
@@ -16,12 +12,8 @@ import {
 } from "@/common/settings.helper";
 
 const initialState = {
-    fontSizeLeft: SettingsHelper.getFontSizeLeft(),
-    fontSizeRight: SettingsHelper.getFontSizeRight(),
-    layoutMode: SettingsHelper.getLayoutMode(),
-    colorPrompt: SettingsHelper.getColorPrompt(),
-    showTextLeft: SettingsHelper.getShowTextLeft(),
-    showTextRight: SettingsHelper.getShowTextRight(),
+    userId: SettingsHelper.getUserId(),
+    userName: "Sergei",
 }
 
 export default createStore({
@@ -29,43 +21,19 @@ export default createStore({
         ...initialState
     },
     mutations: {
-        [SET_FONT_SIZE_LEFT](state, params) {
-            state.fontSizeLeft = params.fontSizeLeft;
+        [SET_USER_ID](state, params) {
+            state.userId = params.userId;
         },
-        [SET_FONT_SIZE_RIGHT](state, params) {
-            state.fontSizeRight = params.fontSizeRight;
-        },
-        [SET_LAYOUT_MODE](state, params) {
-            state.layoutMode = params.layoutMode;
-        },
-        [SET_COLOR_PROMPT](state, params) {
-            state.colorPrompt = params.colorPrompt;
-        },
-        [SET_SHOW_TEXT_LEFT](state, params) {
-            state.showTextLeft = params.showTextLeft;
-        },
-        [SET_SHOW_TEXT_RIGHT](state, params) {
-            state.showTextRight = params.showTextRight;
+        [SET_USER_NAME](state, params) {
+            state.userId = params.userName;
         },
     },
     getters: {
-        fontSizeLeft(state) {
-            return state.fontSizeLeft;
+        userId(state) {
+            return state.userId;
         },
-        fontSizeRight(state) {
-            return state.fontSizeRight;
-        },
-        layoutMode(state) {
-            return state.layoutMode;
-        },
-        colorPrompt(state) {
-            return state.colorPrompt;
-        },
-        showTextLeft(state) {
-            return state.showTextLeft;
-        },
-        showTextRight(state) {
-            return state.showTextRight;
+        userName(state) {
+            return state.userName;
         },
     }
 })
