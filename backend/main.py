@@ -34,8 +34,6 @@ CORS(app)
 def sbs_create():
     """Upload data and create sbs object"""
 
-    print(request.form)
-
     sbs_name = request.form.get("name", "SBS")
     model_name_1 = request.form.get("model_1", "model_1")
     model_name_2 = request.form.get("model_2", "model_2")
@@ -80,31 +78,46 @@ def sbs_create():
 
 
 @app.route("/sbs/list", methods=["GET"])
-def get_splitted():
+def get_sbs_list():
     """Get list of SBS"""
 
     return {"ok": 1}
 
 
-@app.route("/task/get", methods=["GET"])
-def get_task():
+@app.route("/sbs/task/get", methods=["GET"])
+def get_task(sbs_guid, user_guid):
     """Get task"""
 
-    return {"ok": 1}
+    db_helper.ensure_user_exists(sbs_guid, user_guid)
+    tasks = db_helper.get_tasks(sbs_guid, user_guid)
+
+    return {"items": tasks}
 
 
-@app.route("/task/vote", methods=["POST"])
+@app.route("/sbs/task/resolve", methods=["POST"])
 def resolve_task():
     """Resolve task"""
 
-    return {"ok": 1}
+    sbs_guid = request.form.get("sbs_guid", None)
+    user_guid = request.form.get("user_guid", None)
+    task_id = request.form.get("task_id", None)
+    event_id = request.form.get("event_id", None)
+
+    if not sbs_guid or not user_guid or not task_id or not event_id:
+        return ("Please, provide valid parameters", 400)
+
+    db_helper.resolve_task(sbs_guid, user_guid, task_id, event_id)
+
+    return ("", 200)
 
 
-@app.route("/sbs/info", methods=["GET"])
-def get_info():
-    """Get current progress for SBS"""
+@app.route("/sbs/info/<sbs_guid>", methods=["GET"])
+def get_info(sbs_guid):
+    """Get SBS state"""
 
-    return {"ok": 1}
+    data, info = db_helper.get_info(sbs_guid)
+
+    return {"info": info, "data": data}
 
 
 # Not API calls treated like static queries

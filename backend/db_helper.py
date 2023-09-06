@@ -161,3 +161,25 @@ def resolve_task(sbs_guid, user_guid, task_id, event_id):
                 )""",
             (task_id, user_guid, event_id, curr_time),
         )
+
+
+def get_info(sbs_guid):
+    """Get SBS info"""
+    db_path = helper.get_sbs_path(sbs_guid)
+
+    with sqlite3.connect(db_path) as db:
+        data = db.execute(
+            """select
+                    t.id, t.answer_count, t.get_count
+               from
+                    tasks t"""
+        ).fetchall()
+
+        info = db.execute(
+            """select
+                    i.guid, i.name, i.model_1, i.model_2, i.state, i.create_ts
+               from
+                    info i"""
+        ).fetchone()
+
+    return data, info

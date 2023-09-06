@@ -4,6 +4,7 @@ import json
 
 
 def create_sbs(name, first, second, address="localhost:80"):
+    """Create SBS"""
     if not "name" in first or not "name" in second:
         print("Please, provide model names.")
         return
@@ -38,7 +39,14 @@ def create_sbs(name, first, second, address="localhost:80"):
                 files={first["data"]: file_1, second["data"]: file_2},
             )
 
-    # print(r.status_code)
+    res = json.loads(response.content.decode("utf-8"))
+
+    return res
+
+
+def get_info(sbs_guid, address="localhost:80"):
+    """Get SBS status"""
+    response = requests.get(f"http://{address}/sbs/info/{sbs_guid}")
 
     res = json.loads(response.content.decode("utf-8"))
 

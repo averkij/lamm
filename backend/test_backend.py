@@ -7,8 +7,6 @@ user_guid = "new_user_3"
 
 db_helper.ensure_user_exists(sbs_guid, user_guid)
 # %%
-
-
 tasks = db_helper.get_tasks(sbs_guid, user_guid, n=3)
 
 # %%
@@ -23,7 +21,9 @@ tasks
 # EVENT_BOTH_BAD = 4
 # EVENT_SKIP = 5
 
-
 tasks = db_helper.resolve_task(sbs_guid, user_guid, 3, 1)
+
+# %%
+db_helper.get_info(sbs_guid)
 
 # %%
