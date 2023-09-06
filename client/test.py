@@ -18,4 +18,5 @@ res
 import lamm_cli
 
 lamm_cli.get_info("b9a14e6583b942ed9247b9200a4ca9c2")
+
 # %%

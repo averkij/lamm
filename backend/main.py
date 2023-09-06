@@ -116,8 +116,19 @@ def get_info(sbs_guid):
     """Get SBS state"""
 
     data, info = db_helper.get_info(sbs_guid)
+    total_tasks = len(data)
+    solved_tasks = len([x for x in data if x[1] > 0])
 
-    return {"info": info, "data": data}
+    res = {
+        "model_1": info[2],
+        "model_2": info[3],
+        "comment": info[1],
+        "create_ts": info[5],
+        "total_tasks": total_tasks,
+        "solved_tasks": solved_tasks,
+    }
+
+    return res
 
 
 # Not API calls treated like static queries
