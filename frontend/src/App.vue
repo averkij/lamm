@@ -10,7 +10,7 @@
       <v-toolbar class="my-toolbar" flat>
         <v-row>
           <v-col cols="12" class="text-center">
-            {{ userName }} ({{ userId }})
+            {{ userName }} ({{ userId }}) {{ sbsInfo }}
           </v-col>
         </v-row>
       </v-toolbar>
@@ -25,16 +25,16 @@
 </template>
 
 <script>
-// import { SET_LAYOUT_MODE } from "@/store/mutations.type";
 import { mapGetters } from "vuex";
 // import { SettingsHelper } from "./common/settings.helper";
+// import { GET_SBS_INFO, GET_TASK } from "@/store/actions.type";
 
 export default {
   name: "App",
   data: () => ({}),
   mounted() {},
   methods: {
-    init() {},
+    // init() {},
     // changePart(n) {
     //   this.$router.push({
     //     path: `/${n}/${this.langCodeFrom}/${this.langCodeTo}`,
@@ -48,9 +48,17 @@ export default {
     //     layoutMode: layoutMode,
     //   });
     // },
+    // getSbsInfo() {
+    //   console.log(this.$route.params.hash);
+    //   let sbsId = this.$route.params.hash;
+    //   console.log("this.$route.params.hash", this.$route.params.hash);
+    //   this.$store.dispatch(GET_SBS_INFO, {
+    //     sbsId: this.$route.params.hash,
+    //   });
+    // },
   },
   computed: {
-    ...mapGetters(["userId", "userName"]),
+    ...mapGetters(["userId", "userName", "sbsInfo"]),
     // langCodeFrom() {
     //   let langCode = this.$route.params.from;
     //   if (this.LANGUAGES[langCode]) {
@@ -60,7 +68,7 @@ export default {
     // },
   },
   mounted() {
-    // this.init();
+    // this.getSbsInfo();
   },
 };
 </script>
