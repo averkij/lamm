@@ -9,7 +9,8 @@ import {
 import {
     SET_USER_ID,
     SET_USER_NAME,
-    SET_SBS_INFO
+    SET_SBS_INFO,
+    SET_TASK
 } from "./mutations.type"
 
 import {
@@ -24,7 +25,10 @@ import {
 const initialState = {
     userId: SettingsHelper.getUserId(),
     userName: "Sergei",
-    sbsInfo: {}
+    sbsInfo: {},
+    sbsTasks: [
+        ["", "", "", "", ""]
+    ]
 }
 
 export default createStore({
@@ -33,10 +37,27 @@ export default createStore({
     },
     actions: {
         async [GET_SBS_INFO](context, params) {
+
+            console.log("GET_SBS_INFO params", params)
+
             const {
                 data
-            } = await SbsService.getSbsInfo(params);
+            } = await SbsService.getSbsInfo({
+                "sbsId": params.sbsId
+            });
             context.commit(SET_SBS_INFO, {
+                data: data
+            });
+            return data;
+        },
+        async [GET_TASK](context, params) {
+            const {
+                data
+            } = await SbsService.getSbsTask({
+                "sbsId": params.sbsId,
+                "userId": params.userId
+            });
+            context.commit(SET_TASK, {
                 data: data
             });
             return data;
@@ -51,6 +72,9 @@ export default createStore({
         },
         [SET_SBS_INFO](state, params) {
             state.sbsInfo = params.data;
+        },
+        [SET_TASK](state, params) {
+            state.sbsTasks = params.data["items"];
         }
     },
     getters: {
@@ -62,6 +86,9 @@ export default createStore({
         },
         sbsInfo(state) {
             return state.sbsInfo;
+        },
+        sbsTasks(state) {
+            return state.sbsTasks;
         },
     }
 })

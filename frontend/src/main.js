@@ -14,6 +14,11 @@ import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import store from '@/store'
 
+import ApiService from "@/common/api.service";
+
+// import axios from "axios";
+import VueAxios from "vue-axios";
+
 // Styles
 import '@mdi/font/css/materialdesignicons.css'
 import 'vuetify/styles'
@@ -25,8 +30,12 @@ const vuetify = createVuetify({
   directives,
 })
 
+ApiService.init();
+
 createApp(App)
   .use(router)
   .use(vuetify)
   .use(store)
+  .use(VueAxios)
+  // .use(axios)
   .mount('#app')

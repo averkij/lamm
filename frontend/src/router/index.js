@@ -23,7 +23,7 @@ const router = createRouter({
     },
     {
       path: "/sbs/run",
-      redirect: `/sbs/run/some_hash`
+      redirect: `/sbs/run/test_hash`
     },
     {
       path: "/sbs/list",
