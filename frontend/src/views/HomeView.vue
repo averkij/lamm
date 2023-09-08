@@ -108,13 +108,13 @@
 import { defineComponent } from "vue";
 
 // Components
-import { DataProvider } from "@/common/data.provider";
+// import { DataProvider } from "@/common/data.provider";
 import { mapGetters } from "vuex";
 
 export default defineComponent({
   name: "HomeView",
   components: {
-    DataProvider,
+    // DataProvider,
   },
   data() {
     return {
@@ -150,7 +150,7 @@ export default defineComponent({
   },
   methods: {
     sendMessage() {
-      this.data = DataProvider.getSWOT(this.query);
+      // this.data = DataProvider.getSWOT(this.query);
     },
   },
   computed: {
@@ -158,7 +158,7 @@ export default defineComponent({
   },
   watch: {},
   mounted() {
-    this.data = DataProvider.getSWOT(this.query);
+    // this.data = DataProvider.getSWOT(this.query);
   },
 });
 </script>
