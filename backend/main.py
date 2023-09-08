@@ -84,9 +84,11 @@ def get_sbs_list():
     return {"ok": 1}
 
 
-@app.route("/sbs/task/get", methods=["GET"])
+@app.route("/sbs/task/get/<sbs_guid>/<user_guid>", methods=["GET"])
 def get_task(sbs_guid, user_guid):
     """Get task"""
+
+    logging.info(f"Getting task for SBS. sbs_guid: {sbs_guid}.")
 
     db_helper.ensure_user_exists(sbs_guid, user_guid)
     tasks = db_helper.get_tasks(sbs_guid, user_guid)
