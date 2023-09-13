@@ -24,3 +24,7 @@ p {
   writing-mode: vertical-lr;
   transform:scale(-1);
 }
+
+.pre-wrap {
+  white-space: pre-wrap;
+}
