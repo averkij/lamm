@@ -10,7 +10,22 @@
       <v-toolbar class="my-toolbar" flat>
         <v-row>
           <v-col cols="12" class="text-center">
-            {{ userName }} ({{ userId }}) {{ sbsInfo }}
+            <div v-if="showSbsInfo">
+              <!-- 🙂 {{ userName }} ({{ userId }}) 🔋 -->
+              <span class="font-weight-medium">{{ sbsInfo["model_1"] }}</span>
+              против
+              <span class="font-weight-medium">{{ sbsInfo["model_2"] }}</span
+              >: выполнено
+              <span class="font-weight-medium">{{
+                sbsInfo["solved_tasks"]
+              }}</span>
+              из
+              <span class="font-weight-medium">{{
+                sbsInfo["total_tasks"]
+              }}</span>
+              заданий
+              <!-- {{ sbsInfo }} -->
+            </div>
           </v-col>
         </v-row>
       </v-toolbar>
@@ -59,13 +74,12 @@ export default {
   },
   computed: {
     ...mapGetters(["userId", "userName", "sbsInfo"]),
-    // langCodeFrom() {
-    //   let langCode = this.$route.params.from;
-    //   if (this.LANGUAGES[langCode]) {
-    //     return langCode;
-    //   }
-    //   return DEFAULT_FROM;
-    // },
+    showSbsInfo() {
+      if (this.sbsInfo && this.sbsInfo.model_1) {
+        return true;
+      }
+      return false;
+    },
   },
   mounted() {
     // this.getSbsInfo();
