@@ -16,6 +16,7 @@ import {
 import {
     GET_SBS_INFO,
     GET_TASK,
+    RESOLVE_TASK,
 } from "./actions.type"
 
 import {
@@ -59,6 +60,17 @@ export default createStore({
             });
             context.commit(SET_TASK, {
                 data: data
+            });
+            return data;
+        },
+        async [RESOLVE_TASK](context, params) {
+            const {
+                data
+            } = await SbsService.resolveSbsTask({
+                "sbsId": params.sbsId,
+                "userId": params.userId,
+                "taskId": params.taskId,
+                "answer": params.answer
             });
             return data;
         },
