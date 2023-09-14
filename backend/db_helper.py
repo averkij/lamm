@@ -145,14 +145,16 @@ def resolve_task(sbs_guid, user_guid, task_id, event_id):
 
     with sqlite3.connect(db_path) as db:
         # update get count for tasks (sort optimization)
-        db.execute(
-            """update tasks
-                set
-                    answer_count = answer_count + 1
-                where
-                    id = ?""",
-            (task_id,),
-        )
+
+        if event_id != con.EVENT_SKIP:
+            db.execute(
+                """update tasks
+                    set
+                        answer_count = answer_count + 1
+                    where
+                        id = ?""",
+                (task_id,),
+            )
 
         # update history
         db.execute(

@@ -103,7 +103,7 @@ def resolve_task():
     sbs_guid = request.form.get("sbs_guid", None)
     user_guid = request.form.get("user_guid", None)
     task_id = request.form.get("task_id", None)
-    event_id = request.form.get("event_id", None)
+    event_id, _ = helper.try_parse_int(request.form.get("event_id", -1))
 
     if not sbs_guid or not user_guid or not task_id or not event_id:
         return ("Please, provide valid parameters", 400)
