@@ -1,26 +1,81 @@
 <template>
-  <v-row>
-    <v-col cols="12"><div class="text-h4">Информация об SBS</div></v-col>
-    <v-col cols="12"
-      ><p>Дата создания: {{ sbsInfo["create_ts"] }}</p>
-      <p>Модель 1: {{ sbsInfo["model_1"] }}</p>
-      <p>Модель 2: {{ sbsInfo["model_2"] }}</p>
-    </v-col>
+  <div>
+    <v-row>
+      <v-col cols="12"><div class="text-h4">Информация об SBS</div></v-col>
+    </v-row>
+    <v-row class="mt-2">
+      <v-col cols="6">
+        <v-card>
+          <v-table>
+            <tbody>
+              <tr>
+                <td>Дата создания</td>
+                <td>{{ sbsInfo["create_ts"] }}</td>
+              </tr>
+              <tr>
+                <td>Модель 1</td>
+                <td>{{ sbsInfo["model_1"] }}</td>
+              </tr>
+              <tr>
+                <td>Модель 2</td>
+                <td>{{ sbsInfo["model_2"] }}</td>
+              </tr>
+            </tbody>
+          </v-table></v-card
+        >
+      </v-col></v-row
+    >
     <!-- <v-col cols="12">SBS статистика {{ sbsInfo }}</v-col> -->
 
-    <v-col cols="12"><div class="text-h4">Результаты</div></v-col>
-    <v-col>
-      <div id="chart"></div>
+    <v-row class="mt-5">
+      <v-col cols="12"><div class="text-h4">Результаты</div></v-col>
+    </v-row>
+    <v-row class="mt-2">
+      <v-col cols="6">
+        <v-card>
+          <v-table v-if="sbsStat.res">
+            <tbody>
+              <tr>
+                <td>Первый лучше</td>
+                <td>{{ sbsStat.res["1"] }}</td>
+              </tr>
+              <tr>
+                <td>Второй лучше</td>
+                <td>{{ sbsStat.res["2"] }}</td>
+              </tr>
+              <tr>
+                <td>Оба хорошие</td>
+                <td>{{ sbsStat.res["3"] }}</td>
+              </tr>
+              <tr>
+                <td>Оба плохие</td>
+                <td>{{ sbsStat.res["4"] }}</td>
+              </tr>
+            </tbody>
+          </v-table>
+        </v-card>
 
-      <!-- <div>{{ sbsStat.res }}</div> -->
+        <!-- <div>{{ sbsStat.res }}</div> -->
 
-      <!-- <ul>
+        <!-- <ul>
         <li v-for="(item, i) in sbsStat.data" :key="i">
           {{ item }}
         </li>
       </ul> -->
-    </v-col>
-  </v-row>
+      </v-col>
+      <v-col cols="6">
+        <v-card class="pa-5 fill-height d-flex align-center justify-center">
+          <div class="text-h5">
+            {{ this.sbsRes }}
+          </div>
+        </v-card>
+      </v-col>
+    </v-row>
+
+    <v-row>
+      <v-col cols="12"><div class="mt-4" id="chart"></div></v-col>
+    </v-row>
+  </div>
 </template>
 
 <script>
@@ -38,6 +93,7 @@ export default defineComponent({
     return {
       chartRendered: false,
       chart: {},
+      sbsRes: "",
     };
   },
   methods: {
@@ -52,10 +108,27 @@ export default defineComponent({
               sbsId: this.$route.params.hash,
             })
             .then(() => {
+              this.formatSbs();
               this.renderChart();
               this.setUpdateTimer();
             });
         });
+    },
+    formatSbs() {
+      let sbs = this.calculateSbs(this.sbsStat.res);
+
+      this.sbsRes = `${sbs[0]} : ${sbs[1]}`;
+    },
+    calculateSbs(data) {
+      let model1 = data["1"];
+      let model2 = data["2"];
+      let bothGood = data["3"];
+      let bothBad = data["4"];
+
+      let total = model1 + model2 + bothGood + bothBad;
+      let res1 = ((model1 + bothGood / 2) / total) * 100;
+      let res2 = ((model2 + bothGood / 2) / total) * 100;
+      return [res1.toFixed(2), res2.toFixed(2)];
     },
     setUpdateTimer() {
       setTimeout(() => {
