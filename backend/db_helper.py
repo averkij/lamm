@@ -185,3 +185,27 @@ def get_info(sbs_guid):
         ).fetchone()
 
     return data, info
+
+
+def get_stat(sbs_guid):
+    """Get full SBS stat"""
+    db_path = helper.get_sbs_path(sbs_guid)
+
+    with sqlite3.connect(db_path) as db:
+        data = db.execute(
+            """select
+                    h_get.id,
+                    h_get.event_id as get_event,
+                    h_get.insert_ts as get_ts,
+                    h_answer.event_id as answer_event,
+                    h_answer.insert_ts as answer_ts
+                from
+                    history h_get
+                join
+                    history h_answer
+                where
+                    h_get.event_id = 0 and
+                    h_answer.event_id in (1,2,3,4)"""
+        ).fetchall()
+
+    return data

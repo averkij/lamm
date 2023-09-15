@@ -63,6 +63,10 @@ export const SbsService = {
         return ApiService.get("sbs",
             `info/${params.sbsId}`);
     },
+    getSbsStat(params) {
+        return ApiService.get("sbs",
+            `stat/${params.sbsId}`);
+    },
     getSbsTask(params) {
         return ApiService.get("sbs",
             `task/get/${params.sbsId}/${params.userId}`);

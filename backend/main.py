@@ -133,6 +133,19 @@ def get_info(sbs_guid):
     return res
 
 
+@app.route("/sbs/stat/<sbs_guid>", methods=["GET"])
+def get_stat(sbs_guid):
+    """Get full SBS statistics"""
+
+    data = db_helper.get_stat(sbs_guid)
+
+    res = {
+        "data": data,
+    }
+
+    return res
+
+
 # Not API calls treated like static queries
 @app.route("/<path:path>")
 def route_frontend(path):

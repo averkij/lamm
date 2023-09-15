@@ -10,11 +10,13 @@ import {
     SET_USER_ID,
     SET_USER_NAME,
     SET_SBS_INFO,
+    SET_SBS_STAT,
     SET_TASK
 } from "./mutations.type"
 
 import {
     GET_SBS_INFO,
+    GET_SBS_STAT,
     GET_TASK,
     RESOLVE_TASK,
 } from "./actions.type"
@@ -29,7 +31,8 @@ const initialState = {
     sbsInfo: {},
     sbsTasks: [
         ["", "", "", "", ""]
-    ]
+    ],
+    sbsStat: []
 }
 
 export default createStore({
@@ -38,15 +41,23 @@ export default createStore({
     },
     actions: {
         async [GET_SBS_INFO](context, params) {
-
-            console.log("GET_SBS_INFO params", params)
-
             const {
                 data
             } = await SbsService.getSbsInfo({
                 "sbsId": params.sbsId
             });
             context.commit(SET_SBS_INFO, {
+                data: data
+            });
+            return data;
+        },
+        async [GET_SBS_STAT](context, params) {
+            const {
+                data
+            } = await SbsService.getSbsStat({
+                "sbsId": params.sbsId
+            });
+            context.commit(SET_SBS_STAT, {
                 data: data
             });
             return data;
@@ -85,6 +96,9 @@ export default createStore({
         [SET_SBS_INFO](state, params) {
             state.sbsInfo = params.data;
         },
+        [SET_SBS_STAT](state, params) {
+            state.sbsStat = params.data;
+        },
         [SET_TASK](state, params) {
             state.sbsTasks = params.data["items"];
         }
@@ -101,6 +115,9 @@ export default createStore({
         },
         sbsTasks(state) {
             return state.sbsTasks;
+        },
+        sbsStat(state) {
+            return state.sbsStat;
         },
     }
 })
