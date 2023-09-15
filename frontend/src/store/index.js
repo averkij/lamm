@@ -60,6 +60,7 @@ export default createStore({
             context.commit(SET_SBS_STAT, {
                 data: data
             });
+
             return data;
         },
         async [GET_TASK](context, params) {

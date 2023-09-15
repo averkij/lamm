@@ -138,10 +138,11 @@ def get_stat(sbs_guid):
     """Get full SBS statistics"""
 
     data = db_helper.get_stat(sbs_guid)
+    result = {1: 0, 2: 0, 3: 0, 4: 0}
+    for x in data:
+        result[x[1]] += 1
 
-    res = {
-        "data": data,
-    }
+    res = {"data": data, "res": result}
 
     return res
 
