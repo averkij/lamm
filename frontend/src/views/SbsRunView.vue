@@ -1,9 +1,7 @@
 <template>
   <div>
     <v-row class="mt-1">
-      <v-col cols="12" class="text-center text-h5"
-        >{{ taskId }}. {{ taskTitle }}</v-col
-      >
+      <v-col cols="12" class="text-center text-h5">{{ taskTitle }}</v-col>
       <v-col cols="12"
         ><v-alert
           type="info"

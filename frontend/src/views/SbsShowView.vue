@@ -9,6 +9,7 @@ import { defineComponent } from "vue";
 
 // Components
 import { mapGetters } from "vuex";
+import { GET_SBS_INFO } from "@/store/actions.type";
 
 export default defineComponent({
   name: "SbsShowView",
@@ -16,11 +17,19 @@ export default defineComponent({
   data() {
     return {};
   },
-  methods: {},
+  methods: {
+    getSbsInfo() {
+      this.$store.dispatch(GET_SBS_INFO, {
+        sbsId: this.$route.params.hash,
+      });
+    },
+  },
   computed: {
-    ...mapGetters([]),
+    ...mapGetters(["userId", "userName", "sbsInfo"]),
   },
   watch: {},
-  mounted() {},
+  mounted() {
+    this.getSbsInfo();
+  },
 });
 </script>
