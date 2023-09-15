@@ -194,7 +194,7 @@ def get_stat(sbs_guid):
     with sqlite3.connect(db_path) as db:
         data = db.execute(
             """select
-                    h_get.id,
+                    h_get.task_id,
                     h_get.event_id as get_event,
                     h_get.insert_ts as get_ts,
                     h_answer.event_id as answer_event,
@@ -203,6 +203,7 @@ def get_stat(sbs_guid):
                     history h_get
                 join
                     history h_answer
+                        on h_answer.task_id = h_get.task_id
                 where
                     h_get.event_id = 0 and
                     h_answer.event_id in (1,2,3,4)"""
