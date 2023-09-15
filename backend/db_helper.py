@@ -195,9 +195,8 @@ def get_stat(sbs_guid):
         data = db.execute(
             """select
                     h_get.task_id,
-                    h_get.event_id as get_event,
-                    h_get.insert_ts as get_ts,
                     h_answer.event_id as answer_event,
+                    h_get.insert_ts as get_ts,
                     h_answer.insert_ts as answer_ts
                 from
                     history h_get
