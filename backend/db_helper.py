@@ -192,20 +192,33 @@ def get_stat(sbs_guid):
     db_path = helper.get_sbs_path(sbs_guid)
 
     with sqlite3.connect(db_path) as db:
+        # data = db.execute(
+        #     """select
+        #             h_get.task_id,
+        #             h_answer.event_id as answer_event,
+        #             h_get.insert_ts as get_ts,
+        #             h_answer.insert_ts as answer_ts
+        #         from
+        #             history h_get
+        #         join
+        #             history h_answer
+        #                 on h_answer.task_id = h_get.task_id
+        #         where
+        #             h_get.event_id = 0 and
+        #             h_answer.event_id in (1,2,3,4)
+        #             """
+        # ).fetchall()
+
         data = db.execute(
             """select
-                    h_get.task_id,
-                    h_answer.event_id as answer_event,
-                    h_get.insert_ts as get_ts,
-                    h_answer.insert_ts as answer_ts
+                    h.task_id,
+                    h.event_id as answer_event,
+                    h.insert_ts as answer_ts
                 from
-                    history h_get
-                join
-                    history h_answer
-                        on h_answer.task_id = h_get.task_id
+                    history h               
                 where
-                    h_get.event_id = 0 and
-                    h_answer.event_id in (1,2,3,4)"""
+                    h.event_id in (1,2,3,4)
+                    """
         ).fetchall()
 
     return data
