@@ -126,6 +126,11 @@ export default defineComponent({
       let bothBad = data["4"];
 
       let total = model1 + model2 + bothGood + bothBad;
+
+      if (!total) {
+        total = 1;
+      }
+
       let res1 = ((model1 + bothGood / 2) / total) * 100;
       let res2 = ((model2 + bothGood / 2) / total) * 100;
       return [res1.toFixed(2), res2.toFixed(2)];
@@ -133,7 +138,7 @@ export default defineComponent({
     setUpdateTimer() {
       setTimeout(() => {
         this.init();
-      }, 5000);
+      }, 10000);
     },
     getSbsInfo() {
       this.$store.dispatch(GET_SBS_INFO, {
@@ -169,7 +174,7 @@ export default defineComponent({
           type: "bar",
           stacked: true,
           stackType: "100%",
-          height: 350,
+          height: 200,
         },
         series: series,
         plotOptions: {
@@ -180,9 +185,9 @@ export default defineComponent({
         title: {
           text: this.sbsInfo["comment"],
         },
-        // xaxis: {
-        //   categories: [1],
-        // },
+        xaxis: {
+          categories: [1],
+        },
         tooltip: {
           y: {
             formatter: function (val) {
@@ -196,7 +201,7 @@ export default defineComponent({
         legend: {
           position: "top",
           horizontalAlign: "left",
-          offsetX: 40,
+          offsetX: 20,
         },
       };
 
