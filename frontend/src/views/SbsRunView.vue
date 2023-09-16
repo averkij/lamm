@@ -16,9 +16,9 @@
       </v-col> </v-row
     ><v-row class="mt-8">
       <v-col cols="6"
-        ><v-card elevation="1" class="pa-5 bg-yellow-lighten-5 pre-wrap">{{
-          taskLeft
-        }}</v-card></v-col
+        ><v-card elevation="1" class="pa-5 bg-yellow-lighten-5 pre-wrap">
+          {{ taskLeft }}
+        </v-card></v-col
       >
       <v-col cols="6"
         ><v-card elevation="1" class="pa-5 bg-yellow-lighten-5 pre-wrap">
@@ -88,6 +88,7 @@ export default defineComponent({
       taskLeft: "",
       taskRight: "",
       isLoading: false,
+      swapAnswers: false,
     };
   },
   methods: {
@@ -98,6 +99,7 @@ export default defineComponent({
     },
     getNextTask() {
       this.isLoading = true;
+      this.doRandomSwap();
       this.$store
         .dispatch(GET_TASK, {
           sbsId: this.$route.params.hash,
@@ -106,12 +108,28 @@ export default defineComponent({
         .then(() => {
           this.taskId = this.sbsTasks[0][0];
           this.taskTitle = this.sbsTasks[0][1];
-          this.taskLeft = this.sbsTasks[0][3];
-          this.taskRight = this.sbsTasks[0][4];
+
+          if (this.swapAnswers) {
+            this.taskLeft = this.sbsTasks[0][4];
+            this.taskRight = this.sbsTasks[0][3];
+          } else {
+            this.taskLeft = this.sbsTasks[0][3];
+            this.taskRight = this.sbsTasks[0][4];
+          }
+
           this.isLoading = false;
         });
     },
     vote(answer) {
+      //change answer if swapped
+      if (this.swapAnswers) {
+        if (answer == "left") {
+          answer = "right";
+        } else if (answer == "right") {
+          answer = "left";
+        }
+      }
+
       this.$store
         .dispatch(RESOLVE_TASK, {
           sbsId: this.$route.params.hash,
@@ -123,6 +141,15 @@ export default defineComponent({
           this.getNextTask();
           this.getSbsInfo();
         });
+    },
+    doRandomSwap() {
+      let r = Math.round(Math.random());
+      if (r == 1) {
+        this.swapAnswers = true;
+        console.log("[swap answers]");
+      } else {
+        this.swapAnswers = false;
+      }
     },
   },
   computed: {
