@@ -21,13 +21,13 @@
             ><span class="hidden-md-and-up"> | </span>
             <span class="font-weight-medium">{{ sbsInfo["model_2"] }}</span
             >:
-            <span class="hidden-sm-and-down">выполнено</span>
+            <span class="hidden-sm-and-down"> выполнено </span>
             <span class="font-weight-medium">{{
               sbsInfo["solved_tasks"]
             }}</span>
             из
             <span class="font-weight-medium">{{ sbsInfo["total_tasks"] }}</span>
-            <span class="hidden-sm-and-down">заданий</span>
+            <span class="hidden-sm-and-down"> заданий</span>
           </div>
         </div>
 
