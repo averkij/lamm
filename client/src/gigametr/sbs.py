@@ -3,7 +3,7 @@ import os
 import json
 
 
-def create_sbs(name, first, second, address="localhost:80"):
+def create(name, first, second, address="localhost:80"):
     """Create SBS"""
     if not "name" in first or not "name" in second:
         print("Please, provide model names.")
@@ -33,8 +33,8 @@ def create_sbs(name, first, second, address="localhost:80"):
                     "name": name,
                     "model_1": first["name"],
                     "model_2": second["name"],
-                    "filename_1": first["data"],
-                    "filename_2": second["data"],
+                    "filename_1": os.path.basename(first["data"]),
+                    "filename_2": os.path.basename(second["data"]),
                 },
                 files={first["data"]: file_1, second["data"]: file_2},
             )
@@ -44,7 +44,7 @@ def create_sbs(name, first, second, address="localhost:80"):
     return res
 
 
-def get_info(sbs_guid, address="localhost:80"):
+def info(sbs_guid, address="localhost:80"):
     """Get SBS status"""
     response = requests.get(f"http://{address}/sbs/info/{sbs_guid}")
 
