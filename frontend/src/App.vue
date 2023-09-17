@@ -17,15 +17,17 @@
         <div>
           <div v-if="showSbsInfo">
             <span class="font-weight-medium">{{ sbsInfo["model_1"] }}</span>
-            против
+            <span class="hidden-sm-and-down"> против </span
+            ><span class="hidden-md-and-up"> | </span>
             <span class="font-weight-medium">{{ sbsInfo["model_2"] }}</span
-            >: выполнено
+            >:
+            <span class="hidden-sm-and-down">выполнено</span>
             <span class="font-weight-medium">{{
               sbsInfo["solved_tasks"]
             }}</span>
             из
             <span class="font-weight-medium">{{ sbsInfo["total_tasks"] }}</span>
-            заданий
+            <span class="hidden-sm-and-down">заданий</span>
           </div>
         </div>
 

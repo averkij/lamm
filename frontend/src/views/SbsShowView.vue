@@ -4,7 +4,7 @@
       <v-col cols="12"><div class="text-h4">Информация об SBS</div></v-col>
     </v-row>
     <v-row class="mt-2">
-      <v-col cols="6">
+      <v-col cols="12" sm="6">
         <v-card>
           <v-table>
             <tbody>
@@ -31,7 +31,7 @@
       <v-col cols="12"><div class="text-h4">Результаты</div></v-col>
     </v-row>
     <v-row class="mt-2">
-      <v-col cols="6">
+      <v-col cols="12" sm="6">
         <v-card>
           <v-table v-if="sbsStat.res">
             <tbody>
@@ -63,7 +63,7 @@
         </li>
       </ul> -->
       </v-col>
-      <v-col cols="6">
+      <v-col cols="12" sm="6">
         <v-card class="pa-5 fill-height d-flex align-center justify-center">
           <div class="text-h5">
             {{ this.sbsRes }}

@@ -15,19 +15,19 @@
         </v-alert>
       </v-col> </v-row
     ><v-row class="mt-8">
-      <v-col cols="6"
+      <v-col cols="12" sm="6"
         ><v-card elevation="1" class="pa-5 bg-yellow-lighten-5 pre-wrap">
           {{ taskLeft }}
         </v-card></v-col
       >
-      <v-col cols="6"
+      <v-col cols="12" sm="6"
         ><v-card elevation="1" class="pa-5 bg-yellow-lighten-5 pre-wrap">
           {{ taskRight }}
         </v-card></v-col
       >
     </v-row>
     <v-row>
-      <v-col cols="12 mt-8" class="text-center">
+      <v-col cols="12 mt-8 hidden-sm-and-down" class="text-center">
         <v-btn
           color="blue"
           variant="tonal"
@@ -55,6 +55,38 @@
           @click="vote('right')"
           :disabled="isLoading"
           >Правый лучше</v-btn
+        > </v-col
+      ><v-col cols="12 mt-8 hidden-md-and-up" class="text-center">
+        <v-btn
+          color="blue"
+          variant="tonal"
+          @click="vote('left')"
+          :disabled="isLoading"
+          ><span class="hidden-xs">Левый лучше</span
+          ><span class="hidden-sm-and-up">Верхний лучше</span></v-btn
+        ><v-btn
+          class="ml-8"
+          color="blue"
+          variant="tonal"
+          @click="vote('right')"
+          :disabled="isLoading"
+          ><span class="hidden-xs">Правый лучше</span
+          ><span class="hidden-sm-and-up">Нижний лучше</span></v-btn
+        > </v-col
+      ><v-col cols="12 mt-2 hidden-md-and-up" class="text-center"
+        ><v-btn
+          color="green"
+          variant="tonal"
+          @click="vote('good')"
+          :disabled="isLoading"
+          >Оба хорошие</v-btn
+        ><v-btn
+          class="ml-8"
+          color="red"
+          variant="tonal"
+          @click="vote('bad')"
+          :disabled="isLoading"
+          >Оба плохие</v-btn
         >
       </v-col>
       <v-col cols="12 mt-2" class="text-center"
