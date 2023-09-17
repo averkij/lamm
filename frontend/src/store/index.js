@@ -3,6 +3,10 @@ import {
 } from 'vuex'
 
 import {
+    v4 as uuidv4
+} from 'uuid';
+
+import {
     SbsService
 } from "@/common/api.service";
 
@@ -11,7 +15,8 @@ import {
     SET_USER_NAME,
     SET_SBS_INFO,
     SET_SBS_STAT,
-    SET_TASK
+    SET_TASK,
+    SET_TRY_ID
 } from "./mutations.type"
 
 import {
@@ -27,6 +32,7 @@ import {
 
 const initialState = {
     userId: SettingsHelper.getUserId(),
+    tryId: "",
     userName: "Sergei",
     sbsInfo: {},
     sbsTasks: [
@@ -64,14 +70,19 @@ export default createStore({
             return data;
         },
         async [GET_TASK](context, params) {
+            let tryId = uuidv4().substring(0, 12).replace("-", "");
             const {
                 data
             } = await SbsService.getSbsTask({
                 "sbsId": params.sbsId,
-                "userId": params.userId
+                "userId": params.userId,
+                "tryId": tryId
             });
             context.commit(SET_TASK, {
                 data: data
+            });
+            context.commit(SET_TRY_ID, {
+                tryId: tryId
             });
             return data;
         },
@@ -82,6 +93,7 @@ export default createStore({
                 "sbsId": params.sbsId,
                 "userId": params.userId,
                 "taskId": params.taskId,
+                "tryId": params.tryId,
                 "answer": params.answer
             });
             return data;
@@ -102,11 +114,19 @@ export default createStore({
         },
         [SET_TASK](state, params) {
             state.sbsTasks = params.data["items"];
+        },
+        [SET_TRY_ID](state, params) {
+            console.log("tryId:", params.tryId)
+
+            state.tryId = params.tryId;
         }
     },
     getters: {
         userId(state) {
             return state.userId;
+        },
+        tryId(state) {
+            return state.tryId;
         },
         userName(state) {
             return state.userName;

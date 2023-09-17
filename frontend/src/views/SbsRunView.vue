@@ -167,6 +167,7 @@ export default defineComponent({
           sbsId: this.$route.params.hash,
           userId: this.userId,
           taskId: this.taskId,
+          tryId: this.tryId,
           answer: answer,
         })
         .then(() => {
@@ -185,7 +186,7 @@ export default defineComponent({
     },
   },
   computed: {
-    ...mapGetters(["userId", "userName", "sbsInfo", "sbsTasks"]),
+    ...mapGetters(["userId", "userName", "sbsInfo", "sbsTasks", "tryId"]),
   },
   mounted() {
     this.getSbsInfo();

@@ -84,14 +84,14 @@ def get_sbs_list():
     return {"ok": 1}
 
 
-@app.route("/sbs/task/get/<sbs_guid>/<user_guid>", methods=["GET"])
-def get_task(sbs_guid, user_guid):
+@app.route("/sbs/task/get/<sbs_guid>/<user_guid>/<try_id>", methods=["GET"])
+def get_task(sbs_guid, user_guid, try_id):
     """Get task"""
 
     logging.info(f"Getting task for SBS. sbs_guid: {sbs_guid}.")
 
     db_helper.ensure_user_exists(sbs_guid, user_guid)
-    tasks = db_helper.get_tasks(sbs_guid, user_guid)
+    tasks = db_helper.get_tasks(sbs_guid, user_guid, try_id)
 
     return {"items": tasks}
 
@@ -103,12 +103,13 @@ def resolve_task():
     sbs_guid = request.form.get("sbs_guid", None)
     user_guid = request.form.get("user_guid", None)
     task_id = request.form.get("task_id", None)
+    try_id = request.form.get("try_id", None)
     event_id, _ = helper.try_parse_int(request.form.get("event_id", -1))
 
     if not sbs_guid or not user_guid or not task_id or not event_id:
         return ("Please, provide valid parameters", 400)
 
-    db_helper.resolve_task(sbs_guid, user_guid, task_id, event_id)
+    db_helper.resolve_task(sbs_guid, user_guid, task_id, try_id, event_id)
 
     return ("", 200)
 

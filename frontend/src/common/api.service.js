@@ -69,7 +69,7 @@ export const SbsService = {
     },
     getSbsTask(params) {
         return ApiService.get("sbs",
-            `task/get/${params.sbsId}/${params.userId}`);
+            `task/get/${params.sbsId}/${params.userId}/${params.tryId}`);
     },
     resolveSbsTask(params) {
         let form = new FormData();
@@ -99,6 +99,7 @@ export const SbsService = {
         form.append("sbs_guid", params.sbsId);
         form.append("user_guid", params.userId);
         form.append("task_id", params.taskId);
+        form.append("try_id", params.tryId);
         form.append("event_id", eventId);
 
         return ApiService.post("sbs",
