@@ -25,6 +25,11 @@ def create(name, first, second, address="localhost:80"):
         print("Please, provide SBS name.")
         return
 
+    err = validate(first, second)
+    if err:
+        print(err)
+        return
+
     with open(first["data"], "rb") as file_1:
         with open(second["data"], "rb") as file_2:
             response = requests.post(
@@ -51,3 +56,19 @@ def info(sbs_guid, address="localhost:80"):
     res = json.loads(response.content.decode("utf-8"))
 
     return res
+
+
+def validate(first, second):
+    """Validate content"""
+    with open(first["data"], "r", encoding="utf-8") as file1:
+        content1 = json.load(file1)
+
+    with open(second["data"], "r", encoding="utf-8") as file2:
+        content2 = json.load(file2)
+
+    len1, len2 = len(content1), len(content2)
+
+    if len1 != len2:
+        return f"Provided files contain different amount of items: {len1} and {len2}."
+
+    return ""
