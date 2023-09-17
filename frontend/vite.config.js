@@ -11,7 +11,6 @@ import vue from '@vitejs/plugin-vue'
 // https://vitejs.dev/config/
 export default defineConfig({
   base: '/',
-  // base: '/1984/',
   plugins: [vue()],
   resolve: {
     alias: {
