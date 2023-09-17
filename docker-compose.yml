@@ -1,0 +1,10 @@
+version: '3.6'
+services:
+  gigametr:
+    build: .
+    image: gigametr:latest
+    restart: unless-stopped
+    ports:
+        - "${APP_PORT}:80"
+    volumes:
+      - ${APP_DATA_PATH}:/app/data
