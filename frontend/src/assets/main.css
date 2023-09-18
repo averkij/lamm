@@ -28,3 +28,7 @@ p {
 .pre-wrap {
   white-space: pre-wrap;
 }
+
+.btn-main {
+  width: 160px;
+}
