@@ -11,10 +11,10 @@
         <!-- <v-app-bar-nav-icon
           ><v-icon>mdi-alien-outline</v-icon></v-app-bar-nav-icon
         > -->
-
         <v-spacer></v-spacer>
 
         <div>
+          <div v-if="!showSbsInfo" class="text-h6">⚡️ GIGAMETR</div>
           <div v-if="showSbsInfo">
             <span class="font-weight-medium">{{ sbsInfo["model_1"] }}</span>
             <span class="hidden-sm-and-down"> против </span
@@ -30,10 +30,9 @@
             <span class="hidden-sm-and-down"> заданий</span>
           </div>
         </div>
-
         <v-spacer></v-spacer>
 
-        <v-btn icon>
+        <v-btn v-if="showSbsInfo" icon>
           <v-icon @click="switchView">mdi-swap-horizontal</v-icon>
         </v-btn>
       </v-toolbar>
@@ -49,8 +48,6 @@
 
 <script>
 import { mapGetters } from "vuex";
-// import { SettingsHelper } from "./common/settings.helper";
-// import { GET_SBS_INFO, GET_TASK } from "@/store/actions.type";
 
 export default {
   name: "App",
@@ -78,9 +75,7 @@ export default {
       return false;
     },
   },
-  mounted() {
-    // this.getSbsInfo();
-  },
+  mounted() {},
 };
 </script>
   
