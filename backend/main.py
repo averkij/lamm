@@ -39,6 +39,7 @@ def sbs_create():
     model_name_2 = request.form.get("model_2", "model_2")
     filename_1 = request.form["filename_1"]
     filename_2 = request.form["filename_2"]
+    extra_data = request.form.get("extra_data", "{}")
 
     sbs_guid = uuid.uuid4().hex
 
@@ -71,7 +72,7 @@ def sbs_create():
 
     helper.check_data(items_1, items_2)
 
-    db_helper.create_db(sbs_guid, sbs_name, model_name_1, model_name_2)
+    db_helper.create_db(sbs_guid, sbs_name, model_name_1, model_name_2, extra_data)
     db_helper.fill_db(sbs_guid, items_1, items_2)
 
     return {"id": sbs_guid}
@@ -121,6 +122,7 @@ def get_info(sbs_guid):
     data, info = db_helper.get_info(sbs_guid)
     total_tasks = len(data)
     solved_tasks = len([x for x in data if x[1] > 0])
+    extra_data = json.loads(info[6])
 
     res = {
         "model_1": info[2],
@@ -129,6 +131,7 @@ def get_info(sbs_guid):
         "create_ts": info[5],
         "total_tasks": total_tasks,
         "solved_tasks": solved_tasks,
+        "extra_data": extra_data,
     }
 
     return res

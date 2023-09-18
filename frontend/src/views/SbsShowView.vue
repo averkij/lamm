@@ -8,23 +8,47 @@
         <v-card>
           <v-table>
             <tbody>
-              <tr>
+              <!-- <tr>
                 <td>Дата создания</td>
                 <td>{{ sbsInfo["create_ts"] }}</td>
-              </tr>
+              </tr> -->
               <tr>
                 <td>Модель 1</td>
                 <td>{{ sbsInfo["model_1"] }}</td>
               </tr>
               <tr>
-                <td>Модель 2</td>
-                <td>{{ sbsInfo["model_2"] }}</td>
+                <td>Средняя длина ответа</td>
+                <td>{{ getExtra("avg_len_1") }}</td>
+              </tr>
+              <tr>
+                <td>Количество уворотов</td>
+                <td>{{ getExtra("sorry_1") }}</td>
               </tr>
             </tbody>
           </v-table></v-card
         >
-      </v-col></v-row
-    >
+      </v-col>
+      <v-col cols="12" sm="6">
+        <v-card>
+          <v-table>
+            <tbody>
+              <tr>
+                <td>Модель 1</td>
+                <td>{{ sbsInfo["model_2"] }}</td>
+              </tr>
+              <tr>
+                <td>Средняя длина ответа</td>
+                <td>{{ getExtra("avg_len_2") }}</td>
+              </tr>
+              <tr>
+                <td>Количество уворотов</td>
+                <td>{{ getExtra("sorry_2") }}</td>
+              </tr>
+            </tbody>
+          </v-table>
+        </v-card>
+      </v-col>
+    </v-row>
     <!-- <v-col cols="12">SBS статистика {{ sbsInfo }}</v-col> -->
 
     <v-row class="mt-5">
@@ -113,6 +137,16 @@ export default defineComponent({
               this.setUpdateTimer();
             });
         });
+    },
+    getExtra(key) {
+      if (
+        !this.sbsInfo ||
+        !this.sbsInfo["extra_data"] ||
+        !(key in this.sbsInfo["extra_data"])
+      ) {
+        return "";
+      }
+      return this.sbsInfo["extra_data"][key];
     },
     formatSbs() {
       let sbs = this.calculateSbs(this.sbsStat.res);

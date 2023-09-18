@@ -1,14 +1,11 @@
 import logging
 import os
-import pathlib
 import sqlite3
-import datetime
-import json
 import constants as con
 import helper
 
 
-def create_db(sbs_guid, sbs_name, model_name_1, model_name_2):
+def create_db(sbs_guid, sbs_name, model_name_1, model_name_2, extra_data):
     """Init SBS database"""
     db_path = helper.get_sbs_path(sbs_guid)
     curr_time = helper.get_curr_time()
@@ -17,7 +14,16 @@ def create_db(sbs_guid, sbs_name, model_name_1, model_name_2):
         logging.info(f"Creating SBS db: {db_path}")
         with sqlite3.connect(db_path) as db:
             db.execute(
-                "create table info(id integer primary key, guid text UNIQUE, name text, model_1 text, model_2 text, state integer, create_ts text)"
+                """create table info(
+                        id integer primary key,
+                        guid text UNIQUE,
+                        name text,
+                        model_1 text,
+                        model_2 text,
+                        state integer,
+                        create_ts text,
+                        extra_data text default '{}' NOT NULL
+                    )"""
             )
             db.execute(
                 """create table tasks(
@@ -52,7 +58,7 @@ def create_db(sbs_guid, sbs_name, model_name_1, model_name_2):
             db.execute("create table version(id integer primary key, version text)")
 
             db.execute(
-                "insert into info(guid, name, model_1, model_2, state, create_ts) values (?, ?, ?, ?, ?, ?)",
+                "insert into info(guid, name, model_1, model_2, state, create_ts, extra_data) values (?, ?, ?, ?, ?, ?, ?)",
                 (
                     sbs_guid,
                     sbs_name,
@@ -60,6 +66,7 @@ def create_db(sbs_guid, sbs_name, model_name_1, model_name_2):
                     model_name_2,
                     0,
                     curr_time,
+                    extra_data,
                 ),
             )
             db.execute("insert into version(version) values (?)", (con.DB_VERSION,))
@@ -185,7 +192,7 @@ def get_info(sbs_guid):
 
         info = db.execute(
             """select
-                    i.guid, i.name, i.model_1, i.model_2, i.state, i.create_ts
+                    i.guid, i.name, i.model_1, i.model_2, i.state, i.create_ts, i.extra_data
                from
                     info i"""
         ).fetchone()
