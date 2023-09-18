@@ -92,6 +92,14 @@ export const SbsService = {
                 eventId = 4;
                 console.log('Both models are bad');
                 break;
+            case 'commentBadPrompt':
+                eventId = 6;
+                console.log('Comment. Bad prompt.');
+                break;
+            case 'commentOther':
+                eventId = 7;
+                console.log('Comment. Other.');
+                break;
             default:
                 console.log('Task is skipped');
         }

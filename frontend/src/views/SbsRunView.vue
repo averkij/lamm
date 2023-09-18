@@ -30,26 +30,27 @@
       <v-col cols="12 mt-8 hidden-sm-and-down" class="text-center">
         <v-btn
           color="blue"
+          class="btn-main"
           variant="tonal"
           @click="vote('left')"
           :disabled="isLoading"
           >Левый лучше</v-btn
         ><v-btn
-          class="ml-8"
+          class="ml-8 btn-main"
           color="green"
           variant="tonal"
           @click="vote('good')"
           :disabled="isLoading"
           >Оба хорошие</v-btn
         ><v-btn
-          class="ml-8"
+          class="ml-8 btn-main"
           color="red"
           variant="tonal"
           @click="vote('bad')"
           :disabled="isLoading"
           >Оба плохие</v-btn
         ><v-btn
-          class="ml-8"
+          class="ml-8 btn-main"
           color="blue"
           variant="tonal"
           @click="vote('right')"
@@ -58,7 +59,7 @@
         > </v-col
       ><v-col cols="12 mt-8 hidden-md-and-up" class="text-center">
         <v-btn
-          color="blue"
+          color="blue btn-main"
           variant="tonal"
           @click="vote('left')"
           :disabled="isLoading"
@@ -66,7 +67,7 @@
           ><span class="hidden-sm-and-up">Верхний лучше</span></v-btn
         ><v-btn
           class="ml-8"
-          color="blue"
+          color="blue btn-main"
           variant="tonal"
           @click="vote('right')"
           :disabled="isLoading"
@@ -76,12 +77,13 @@
       ><v-col cols="12 mt-2 hidden-md-and-up" class="text-center"
         ><v-btn
           color="green"
+          class="btn-main"
           variant="tonal"
           @click="vote('good')"
           :disabled="isLoading"
           >Оба хорошие</v-btn
         ><v-btn
-          class="ml-8"
+          class="ml-8 btn-main"
           color="red"
           variant="tonal"
           @click="vote('bad')"
@@ -91,14 +93,32 @@
       </v-col>
       <v-col cols="12 mt-2" class="text-center"
         ><v-btn
-          class="ml-8"
+          class="btn-main"
           color="grey"
           variant="tonal"
           @click="vote('skip')"
           :disabled="isLoading"
           >Пропустить</v-btn
-        ></v-col
-      >
+        ><v-btn
+          class="ml-8 btn-main"
+          color="grey"
+          variant="tonal"
+          @click="
+            // $refs.commentDialog.init();
+            showCommentDialog = true
+          "
+          :disabled="isLoading"
+          >Пометить</v-btn
+        >
+        <CommentDialog
+          ref="commentDialog"
+          v-model="showCommentDialog"
+          :inProgress="commentInProgress"
+          @comment="sendComment"
+          @close="showCommentDialog = false"
+        />
+        <!-- :totalBatches="selectedProcessingTotalBatches" -->
+      </v-col>
     </v-row>
   </div>
 </template>
@@ -109,10 +129,10 @@ import { defineComponent } from "vue";
 // Components
 import { mapGetters } from "vuex";
 import { GET_SBS_INFO, GET_TASK, RESOLVE_TASK } from "@/store/actions.type";
+import CommentDialog from "@/components/CommentDialog.vue";
 
 export default defineComponent({
   name: "SbsRunView",
-  components: {},
   data() {
     return {
       taskId: "",
@@ -121,6 +141,8 @@ export default defineComponent({
       taskRight: "",
       isLoading: false,
       swapAnswers: false,
+      showCommentDialog: false,
+      commentInProgress: false,
     };
   },
   methods: {
@@ -150,6 +172,23 @@ export default defineComponent({
           }
 
           this.isLoading = false;
+        });
+    },
+    sendComment(comment, event) {
+      this.commentInProgress = true;
+      console.log("Comment:", comment, "Event:", event);
+
+      this.$store
+        .dispatch(RESOLVE_TASK, {
+          sbsId: this.$route.params.hash,
+          userId: this.userId,
+          taskId: this.taskId,
+          tryId: this.tryId,
+          answer: event,
+        })
+        .then(() => {
+          this.commentInProgress = false;
+          this.showCommentDialog = false;
         });
     },
     vote(answer) {
@@ -192,5 +231,6 @@ export default defineComponent({
     this.getSbsInfo();
     this.getNextTask();
   },
+  components: { CommentDialog },
 });
 </script>
