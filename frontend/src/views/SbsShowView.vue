@@ -33,7 +33,7 @@
           <v-table>
             <tbody>
               <tr>
-                <td>Модель 1</td>
+                <td>Модель 2</td>
                 <td>{{ sbsInfo["model_2"] }}</td>
               </tr>
               <tr>
