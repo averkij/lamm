@@ -109,6 +109,7 @@ export const SbsService = {
         form.append("task_id", params.taskId);
         form.append("try_id", params.tryId);
         form.append("event_id", eventId);
+        form.append("comment", params.comment);
 
         return ApiService.post("sbs",
             `task/resolve`, form);

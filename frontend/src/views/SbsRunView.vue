@@ -184,6 +184,7 @@ export default defineComponent({
           userId: this.userId,
           taskId: this.taskId,
           tryId: this.tryId,
+          comment: comment,
           answer: event,
         })
         .then(() => {

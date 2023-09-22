@@ -94,7 +94,8 @@ export default createStore({
                 "userId": params.userId,
                 "taskId": params.taskId,
                 "tryId": params.tryId,
-                "answer": params.answer
+                "answer": params.answer,
+                "comment": params.comment
             });
             return data;
         },

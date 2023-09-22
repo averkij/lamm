@@ -152,7 +152,7 @@ def get_tasks(sbs_guid, user_guid, try_id, n=1):
     return [(x[0], x[1], x[2], x[3], x[4], x[5]) for x in tasks]
 
 
-def resolve_task(sbs_guid, user_guid, task_id, try_id, event_id):
+def resolve_task(sbs_guid, user_guid, task_id, try_id, event_id, comment):
     """Process user answer"""
     db_path = helper.get_sbs_path(sbs_guid)
     curr_time = helper.get_curr_time()
@@ -172,10 +172,10 @@ def resolve_task(sbs_guid, user_guid, task_id, try_id, event_id):
 
         # update history
         db.execute(
-            """insert into history (task_id, try_id, user_id, event_id, insert_ts) values (
-                    ?, ?, (select u.id from users u where u.guid=?),?,?
+            """insert into history (task_id, try_id, user_id, event_id, insert_ts, comment) values (
+                    ?, ?, (select u.id from users u where u.guid=?),?,?,?
                 )""",
-            (task_id, try_id, user_guid, event_id, curr_time),
+            (task_id, try_id, user_guid, event_id, curr_time, comment),
         )
 
 

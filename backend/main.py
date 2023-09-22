@@ -106,11 +106,12 @@ def resolve_task():
     task_id = request.form.get("task_id", None)
     try_id = request.form.get("try_id", None)
     event_id, _ = helper.try_parse_int(request.form.get("event_id", -1))
+    comment = request.form.get("comment", None)
 
     if not sbs_guid or not user_guid or not task_id or not event_id:
         return ("Please, provide valid parameters", 400)
 
-    db_helper.resolve_task(sbs_guid, user_guid, task_id, try_id, event_id)
+    db_helper.resolve_task(sbs_guid, user_guid, task_id, try_id, event_id, comment)
 
     return ("", 200)
 
