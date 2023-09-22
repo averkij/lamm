@@ -50,7 +50,8 @@ def create_db(sbs_guid, sbs_name, model_name_1, model_name_2, extra_data):
                         try_id text NULL,
                         user_id integer NOT NULL,
                         event_id int default 0 NOT NULL,
-                        insert_ts text
+                        insert_ts text NOT NULL,
+                        comment text NULL
                        )"""
             )
             db.execute("""create index ix_history_try_id on history (try_id);""")
@@ -233,5 +234,78 @@ def get_stat(sbs_guid):
                     h.event_id in (1,2,3,4)
                     """
         ).fetchall()
+
+    return data
+
+
+def get_history(sbs_guid, event_ids=[1, 2, 3, 4]):
+    """Get full history with comments"""
+    db_path = helper.get_sbs_path(sbs_guid)
+
+    # comments are available in 0.3+
+    if float(con.DB_VERSION) >= 0.3:
+        with sqlite3.connect(db_path) as db:
+            data = db.execute(
+                """select
+                        h.task_id,
+                        u.guid,
+                        t.question_1,
+                        t.question_2,
+                        t.answer_1,
+                        t.answer_2,
+                        h.event_id,
+                        h.comment,
+                        h.insert_ts
+                    from
+                        history h
+                            join tasks t on t.id = h.task_id
+                            join users u on u.id = h.user_id
+                    where
+                        h.event_id in ({0})
+                    order by
+                        h.task_id""".format(
+                    ",".join("?" * len(event_ids))
+                ),
+                event_ids,
+            ).fetchall()
+    else:
+        with sqlite3.connect(db_path) as db:
+            data = db.execute(
+                """select
+                        h.task_id,
+                        u.guid,
+                        t.question_1,
+                        t.question_2,
+                        t.answer_1,
+                        t.answer_2,
+                        h.event_id,
+                        h.insert_ts
+                    from
+                        history h
+                            join tasks t on t.id = h.task_id
+                            join users u on u.id = h.user_id
+                    where
+                        h.event_id in ({0})
+                    order by
+                        h.task_id""".format(
+                    ",".join("?" * len(event_ids))
+                ),
+                event_ids,
+            ).fetchall()
+
+    return data
+
+
+def get_version(sbs_guid):
+    """Get SBS DB version"""
+    db_path = helper.get_sbs_path(sbs_guid)
+
+    with sqlite3.connect(db_path) as db:
+        data = db.execute(
+            """select
+                        version
+                    from
+                        version"""
+        ).fetchone()
 
     return data
