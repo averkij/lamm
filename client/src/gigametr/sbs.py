@@ -86,20 +86,29 @@ def avg_len(content):
 def info(sbs_guid, address="localhost:80"):
     """Get SBS status"""
     response = requests.get(f"http://{address}/sbs/info/{sbs_guid}")
-
     res = json.loads(response.content.decode("utf-8"))
+    return res
 
+
+def get_actions(sbs_guid, address="localhost:80"):
+    """Get SBS actions history"""
+    response = requests.get(f"http://{address}/sbs/history/actions/{sbs_guid}")
+    res = json.loads(response.content.decode("utf-8"))
+    return res
+
+
+def get_comments(sbs_guid, address="localhost:80"):
+    """Get SBS comments history"""
+    response = requests.get(f"http://{address}/sbs/history/comments/{sbs_guid}")
+    res = json.loads(response.content.decode("utf-8"))
     return res
 
 
 def validate(content1, content2):
     """Validate content"""
-
     len1, len2 = len(content1), len(content2)
-
     if len1 != len2:
         return f"Provided files contain different amount of items: {len1} and {len2}."
-
     return ""
 
 
