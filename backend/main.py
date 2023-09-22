@@ -231,6 +231,18 @@ def get_version(sbs_guid):
     return {"version": data}
 
 
+@app.route("/sbs/patch/<sbs_guid>", methods=["GET"])
+def patch_db(sbs_guid):
+    """Patch SBS DB schema to the latest version"""
+
+    if not helper.db_exists(sbs_guid):
+        return ("SBS not found", 404)
+
+    db_helper.patch_db(sbs_guid)
+
+    return ("", 200)
+
+
 # Not API calls treated like static queries
 @app.route("/<path:path>")
 def route_frontend(path):

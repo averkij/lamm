@@ -104,6 +104,12 @@ def get_comments(sbs_guid, address="localhost:80"):
     return res
 
 
+def update_db(sbs_guid, address="localhost:80"):
+    """Patch SBS DB schema to the latest version"""
+    response = requests.get(f"http://{address}/sbs/patch/{sbs_guid}")
+    return response.status_code
+
+
 def validate(content1, content2):
     """Validate content"""
     len1, len2 = len(content1), len(content2)

@@ -306,6 +306,26 @@ def get_history(sbs_guid, event_ids=[1, 2, 3, 4]):
     return data
 
 
+def patch_db(sbs_guid):
+    """Patch database schema to the latest version"""
+    db_path = helper.get_sbs_path(sbs_guid)
+    db_version = get_version(sbs_guid)
+
+    # if db_version < float(con.DB_VERSION):
+    # add comment field to history table
+    with sqlite3.connect(db_path) as db:
+        col_comment_exists = db.execute(
+            "select count(*) as cnt from pragma_table_info('history') where name='comment'"
+        ).fetchone()[0]
+
+        if col_comment_exists == 0:
+            db.execute("alter table history add column comment text")
+
+    # update DB version
+    with sqlite3.connect(db_path) as db:
+        db.execute("update version set version = ?", (con.DB_VERSION,))
+
+
 def get_version(sbs_guid):
     """Get SBS DB version"""
     db_path = helper.get_sbs_path(sbs_guid)
