@@ -89,6 +89,9 @@ def get_sbs_list():
 def get_task(sbs_guid, user_guid, try_id):
     """Get task"""
 
+    if not helper.db_exists(sbs_guid):
+        return ("SBS not found", 404)
+
     logging.info(f"Getting task for SBS. sbs_guid: {sbs_guid}.")
 
     db_helper.ensure_user_exists(sbs_guid, user_guid)
@@ -111,6 +114,9 @@ def resolve_task():
     if not sbs_guid or not user_guid or not task_id or not event_id:
         return ("Please, provide valid parameters", 400)
 
+    if not helper.db_exists(sbs_guid):
+        return ("SBS not found", 404)
+
     db_helper.resolve_task(sbs_guid, user_guid, task_id, try_id, event_id, comment)
 
     return ("", 200)
@@ -119,6 +125,9 @@ def resolve_task():
 @app.route("/sbs/info/<sbs_guid>", methods=["GET"])
 def get_info(sbs_guid):
     """Get SBS state"""
+
+    if not helper.db_exists(sbs_guid):
+        return ("SBS not found", 404)
 
     data, info = db_helper.get_info(sbs_guid)
     total_tasks = len(data)
@@ -142,6 +151,9 @@ def get_info(sbs_guid):
 def get_stat(sbs_guid):
     """Get full SBS statistics"""
 
+    if not helper.db_exists(sbs_guid):
+        return ("SBS not found", 404)
+
     data = db_helper.get_stat(sbs_guid)
     result = {1: 0, 2: 0, 3: 0, 4: 0}
     for x in data:
@@ -156,6 +168,10 @@ def get_stat(sbs_guid):
 def get_actions(sbs_guid):
     """Get SBS history (target actions only)"""
 
+    if not helper.db_exists(sbs_guid):
+        return ("SBS not found", 404)
+
+    db_version = db_helper.get_version(sbs_guid)
     data = db_helper.get_history(sbs_guid, event_ids=con.ACTION_EVENTS)
 
     res = [
@@ -167,7 +183,7 @@ def get_actions(sbs_guid):
             "model_1": x[4],
             "model_2": x[5],
             "res": helper.format_event(x[6]),
-            "ts": x[8],
+            "comment": x[8] if db_version >= 0.3 else None,
         }
         for x in data
     ]
@@ -179,6 +195,10 @@ def get_actions(sbs_guid):
 def get_comments(sbs_guid):
     """Get SBS history (target actions only)"""
 
+    if not helper.db_exists(sbs_guid):
+        return ("SBS not found", 404)
+
+    db_version = db_helper.get_version(sbs_guid)
     data = db_helper.get_history(sbs_guid, event_ids=con.COMMENT_EVENTS)
 
     res = [
@@ -189,9 +209,9 @@ def get_comments(sbs_guid):
             "prompt_2": x[3],
             "model_1": x[4],
             "model_2": x[5],
-            "comment": x[7],
             "res": helper.format_event(x[6]),
-            "ts": x[8],
+            "ts": x[7],
+            "comment": x[8] if db_version >= 0.3 else None,
         }
         for x in data
     ]
@@ -202,6 +222,9 @@ def get_comments(sbs_guid):
 @app.route("/sbs/version/<sbs_guid>", methods=["GET"])
 def get_version(sbs_guid):
     """Get SBS DB version"""
+
+    if not helper.db_exists(sbs_guid):
+        return ("SBS not found", 404)
 
     data = db_helper.get_version(sbs_guid)
 

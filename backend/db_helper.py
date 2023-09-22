@@ -156,6 +156,7 @@ def resolve_task(sbs_guid, user_guid, task_id, try_id, event_id, comment):
     """Process user answer"""
     db_path = helper.get_sbs_path(sbs_guid)
     curr_time = helper.get_curr_time()
+    db_version = get_version(sbs_guid)
 
     with sqlite3.connect(db_path) as db:
         # update get count for tasks (sort optimization)
@@ -171,12 +172,20 @@ def resolve_task(sbs_guid, user_guid, task_id, try_id, event_id, comment):
             )
 
         # update history
-        db.execute(
-            """insert into history (task_id, try_id, user_id, event_id, insert_ts, comment) values (
-                    ?, ?, (select u.id from users u where u.guid=?),?,?,?
-                )""",
-            (task_id, try_id, user_guid, event_id, curr_time, comment),
-        )
+        if db_version >= 0.3:
+            db.execute(
+                """insert into history (task_id, try_id, user_id, event_id, insert_ts, comment) values (
+                        ?, ?, (select u.id from users u where u.guid=?),?,?,?
+                    )""",
+                (task_id, try_id, user_guid, event_id, curr_time, comment),
+            )
+        else:
+            db.execute(
+                """insert into history (task_id, try_id, user_id, event_id, insert_ts) values (
+                        ?, ?, (select u.id from users u where u.guid=?),?,?
+                    )""",
+                (task_id, try_id, user_guid, event_id, curr_time),
+            )
 
 
 def get_info(sbs_guid):
@@ -241,9 +250,10 @@ def get_stat(sbs_guid):
 def get_history(sbs_guid, event_ids=[1, 2, 3, 4]):
     """Get full history with comments"""
     db_path = helper.get_sbs_path(sbs_guid)
+    db_version = get_version(sbs_guid)
 
     # comments are available in 0.3+
-    if float(con.DB_VERSION) >= 0.3:
+    if db_version >= 0.3:
         with sqlite3.connect(db_path) as db:
             data = db.execute(
                 """select
@@ -254,8 +264,8 @@ def get_history(sbs_guid, event_ids=[1, 2, 3, 4]):
                         t.answer_1,
                         t.answer_2,
                         h.event_id,
-                        h.comment,
-                        h.insert_ts
+                        h.insert_ts,
+                        h.comment
                     from
                         history h
                             join tasks t on t.id = h.task_id
@@ -308,4 +318,4 @@ def get_version(sbs_guid):
                         version"""
         ).fetchone()
 
-    return data
+    return float(data[0])
