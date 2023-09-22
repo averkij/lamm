@@ -8,6 +8,24 @@ import sys
 import datetime
 
 
+def format_event(event_id):
+    """Format event"""
+    if event_id == con.EVENT_GET:
+        return "get"
+    elif event_id == con.EVENT_MODEL_1_BETTER:
+        return "first_better"
+    elif event_id == con.EVENT_MODEL_2_BETTER:
+        return "second_better"
+    elif event_id == con.EVENT_BOTH_GOOD:
+        return "both_good"
+    elif event_id == con.EVENT_BOTH_BAD:
+        return "both_bad"
+    elif event_id == con.EVENT_COMMENT_BAD_PROMPT:
+        return "bad_prompt"
+    elif event_id == con.EVENT_COMMENT_OTHER:
+        return "other_comment"
+
+
 def check_folder(folder):
     """Check if folder exists"""
     pathlib.Path(folder).mkdir(parents=True, exist_ok=True)

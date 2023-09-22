@@ -151,6 +151,62 @@ def get_stat(sbs_guid):
     return res
 
 
+@app.route("/sbs/history/actions/<sbs_guid>", methods=["GET"])
+def get_actions(sbs_guid):
+    """Get SBS history (target actions only)"""
+
+    data = db_helper.get_history(sbs_guid, event_ids=con.ACTION_EVENTS)
+
+    res = [
+        {
+            "id": x[0],
+            "user_id": x[1],
+            "prompt_1": x[2],
+            "prompt_2": x[3],
+            "model_1": x[4],
+            "model_2": x[5],
+            "res": helper.format_event(x[6]),
+            "ts": x[8],
+        }
+        for x in data
+    ]
+
+    return {"data": res}
+
+
+@app.route("/sbs/history/comments/<sbs_guid>", methods=["GET"])
+def get_comments(sbs_guid):
+    """Get SBS history (target actions only)"""
+
+    data = db_helper.get_history(sbs_guid, event_ids=con.COMMENT_EVENTS)
+
+    res = [
+        {
+            "id": x[0],
+            "user_id": x[1],
+            "prompt_1": x[2],
+            "prompt_2": x[3],
+            "model_1": x[4],
+            "model_2": x[5],
+            "comment": x[7],
+            "res": helper.format_event(x[6]),
+            "ts": x[8],
+        }
+        for x in data
+    ]
+
+    return {"data": res}
+
+
+@app.route("/sbs/version/<sbs_guid>", methods=["GET"])
+def get_version(sbs_guid):
+    """Get SBS DB version"""
+
+    data = db_helper.get_version(sbs_guid)
+
+    return {"version": data}
+
+
 # Not API calls treated like static queries
 @app.route("/<path:path>")
 def route_frontend(path):
