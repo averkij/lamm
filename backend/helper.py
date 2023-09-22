@@ -39,6 +39,14 @@ def create_folders(hash):
         )
 
 
+def db_exists(sbs_guid):
+    """Check if DB exists"""
+    path = get_sbs_path(sbs_guid)
+    if os.path.isfile(path):
+        return True
+    return False
+
+
 def get_curr_time():
     """Get formatted time"""
     return datetime.datetime.utcnow().strftime("%Y-%m-%d_%H:%M:%S")
