@@ -157,7 +157,7 @@ export default defineComponent({
       let model1 = data["1"];
       let model2 = data["2"];
       let bothGood = data["3"];
-      let bothBad = data["4"];
+      // let bothBad = data["4"];
 
       let total = model1 + model2 + bothGood;
 
