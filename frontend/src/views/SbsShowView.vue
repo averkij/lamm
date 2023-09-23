@@ -136,6 +136,12 @@ export default defineComponent({
               this.renderChart();
               this.setUpdateTimer();
             });
+        })
+        .catch(() => {
+          console.log("Can not get task. SBS not found.");
+          this.$router.push({
+            path: `/sbs/nooooooooooooo`,
+          });
         });
     },
     getExtra(key) {
