@@ -1,26 +1,32 @@
 
 <style>
 @import "./assets/main.css";
+@import url("https://fonts.googleapis.com/css2?family=Audiowide&display=swap");
 </style>
 
 <template>
   <div>
     <v-app>
       <!-- Top app bar -->
-      <v-toolbar class="my-toolbar" flat>
+      <v-toolbar :color="showSbsInfo ? 'deep-purple' : 'deep-purple'" flat>
         <!-- <v-app-bar-nav-icon
           ><v-icon>mdi-alien-outline</v-icon></v-app-bar-nav-icon
         > -->
         <v-spacer></v-spacer>
 
         <div>
-          <div v-if="!showSbsInfo" class="text-h6">⚡️ GIGAMETR</div>
+          <div v-if="!showSbsInfo" class="font-title">⚡️ GIGAMETR</div>
           <div v-if="showSbsInfo">
-            <span class="font-weight-medium">{{ sbsInfo["model_1"] }}</span>
-            <span class="hidden-sm-and-down"> против </span
-            ><span class="hidden-md-and-up"> | </span>
-            <span class="font-weight-medium">{{ sbsInfo["model_2"] }}</span
-            >:
+            ⚡️
+            <span class="font-weight-medium hidden-sm-and-down">
+              {{ sbsInfo["model_1"] }}</span
+            >
+            <span class="hidden-sm-and-down"> против </span>
+            <!-- <span class="hidden-md-and-up"> | </span> -->
+            <span class="font-weight-medium hidden-sm-and-down">{{
+              sbsInfo["model_2"]
+            }}</span>
+            <span class="hidden-sm-and-down">:</span>
             <span class="hidden-sm-and-down"> выполнено </span>
             <span class="font-weight-medium">{{
               sbsInfo["solved_tasks"]

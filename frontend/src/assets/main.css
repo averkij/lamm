@@ -32,3 +32,12 @@ p {
 .btn-main {
   width: 160px;
 }
+
+.font-title {
+  font-family: 'Audiowide', cursive;
+  font-size: 24px;
+}
+
+/* .main-toolbar {
+  background-color: black !important;
+}  */
