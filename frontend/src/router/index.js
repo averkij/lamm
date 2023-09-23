@@ -5,7 +5,7 @@ import {
 
 import HomeView from '../views/HomeView.vue'
 import SbsRunView from '../views/SbsRunView.vue'
-// import SbsListView from '../views/SbsListView.vue'
+import SbsNotFoundView from '../views/SbsNotFoundView.vue'
 import SbsShowView from '../views/SbsShowView.vue'
 
 const router = createRouter({
@@ -25,11 +25,11 @@ const router = createRouter({
       path: "/sbs/run",
       redirect: `/`
     },
-    // {
-    //   path: "/sbs/list",
-    //   name: "sbslist",
-    //   component: SbsListView
-    // },
+    {
+      path: "/sbs/nooooooooooooo",
+      name: "sbsNotFound",
+      component: SbsNotFoundView
+    },
     {
       path: "/sbs/show/:hash",
       name: "sbsshow",
