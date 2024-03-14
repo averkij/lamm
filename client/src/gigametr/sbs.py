@@ -104,9 +104,25 @@ def get_comments(sbs_guid, address="localhost:80"):
     return res
 
 
-def update_db(sbs_guid, address="localhost:80"):
+def debug_update_db(sbs_guid, address="localhost:80"):
     """Patch SBS DB schema to the latest version"""
-    response = requests.get(f"http://{address}/sbs/patch/{sbs_guid}")
+    response = requests.get(f"http://{address}/sbs/debug/patch/{sbs_guid}")
+    return response.status_code
+
+
+def debug_set_answer_counter(sbs_guid, task_id, count, address="localhost:80"):
+    """Drop answer counter"""
+    response = requests.get(
+        f"http://{address}/sbs/debug/counter/answer/set/{sbs_guid}/{task_id}/{count}"
+    )
+    return response.status_code
+
+
+def debug_update_sbs_state(sbs_guid, state_id, address="localhost:80"):
+    """Update SBS state"""
+    response = requests.get(
+        f"http://{address}/sbs/debug/state/set/{sbs_guid}/{state_id}"
+    )
     return response.status_code
 
 
