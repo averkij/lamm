@@ -49,7 +49,21 @@
         </v-card>
       </v-col>
     </v-row>
-    <!-- <v-col cols="12">SBS статистика {{ sbsInfo }}</v-col> -->
+
+    <v-row class="mt-5">
+      <v-col cols="12"><div class="text-h4">Статус</div></v-col>
+    </v-row>
+    <v-row class="mt-2">
+      <v-col cols="12" sm="6">
+        <v-badge
+          v-if="sbsInfo['state'] == 0"
+          color="info"
+          content="В работе"
+          inline
+        ></v-badge>
+        <v-badge v-else color="success" content="Завершено" inline></v-badge>
+      </v-col>
+    </v-row>
 
     <v-row class="mt-5">
       <v-col cols="12"><div class="text-h4">Результаты</div></v-col>

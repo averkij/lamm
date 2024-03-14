@@ -1,20 +1,16 @@
 """Main module"""
 
-import datetime
+import json
 import logging
 import os
-import tempfile
 import uuid
 
 import config
 import constants as con
 import db_helper
 import helper
-import json
-
 from flask import Flask, abort, request, send_file
 from flask_cors import CORS
-
 
 helper.configure_logging()
 
@@ -131,7 +127,8 @@ def get_info(sbs_guid):
 
     data, info = db_helper.get_info(sbs_guid)
     total_tasks = len(data)
-    solved_tasks = len([x for x in data if x[1] > 0])
+    answer_ids = [x for x in data if x[1] > 0]
+    solved_tasks = len(answer_ids)
     extra_data = json.loads(info[6])
 
     res = {
@@ -142,6 +139,8 @@ def get_info(sbs_guid):
         "total_tasks": total_tasks,
         "solved_tasks": solved_tasks,
         "extra_data": extra_data,
+        "answer_ids": answer_ids,
+        "state": info[4],
     }
 
     return res
@@ -171,7 +170,6 @@ def get_actions(sbs_guid):
     if not helper.db_exists(sbs_guid):
         return ("SBS not found", 404)
 
-    db_version = db_helper.get_version(sbs_guid)
     data = db_helper.get_history(sbs_guid, event_ids=con.ACTION_EVENTS)
 
     res = [
@@ -183,7 +181,6 @@ def get_actions(sbs_guid):
             "model_1": x[4],
             "model_2": x[5],
             "res": helper.format_event(x[6]),
-            "comment": x[8] if db_version >= 0.3 else None,
         }
         for x in data
     ]
@@ -193,7 +190,7 @@ def get_actions(sbs_guid):
 
 @app.route("/sbs/history/comments/<sbs_guid>", methods=["GET"])
 def get_comments(sbs_guid):
-    """Get SBS history (target actions only)"""
+    """Get SBS history (comments actions only)"""
 
     if not helper.db_exists(sbs_guid):
         return ("SBS not found", 404)
@@ -231,9 +228,35 @@ def get_version(sbs_guid):
     return {"version": data}
 
 
-@app.route("/sbs/patch/<sbs_guid>", methods=["GET"])
+@app.route("/sbs/debug/state/set/<sbs_guid>/<state_id>", methods=["GET"])
+def set_sbs_state(sbs_guid, state_id):
+    """[DEBUG METHOD] Set SBS state"""
+
+    if not helper.db_exists(sbs_guid):
+        return ("SBS not found", 404)
+
+    db_helper.update_sbs_state(sbs_guid, state_id)
+
+    return ("", 200)
+
+
+@app.route(
+    "/sbs/debug/counter/answer/set/<sbs_guid>/<task_id>/<count>", methods=["GET"]
+)
+def set_answer_counter(sbs_guid, task_id, count):
+    """[DEBUG METHOD] Set answer counter for task"""
+
+    if not helper.db_exists(sbs_guid):
+        return ("SBS not found", 404)
+
+    db_helper.set_answer_counter(sbs_guid, task_id, count)
+
+    return ("", 200)
+
+
+@app.route("/sbs/debug/patch/<sbs_guid>", methods=["GET"])
 def patch_db(sbs_guid):
-    """Patch SBS DB schema to the latest version"""
+    """[DEBUG METHOD] Patch SBS DB schema to the latest version"""
 
     if not helper.db_exists(sbs_guid):
         return ("SBS not found", 404)

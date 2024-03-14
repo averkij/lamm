@@ -71,6 +71,14 @@ export const SbsService = {
         return ApiService.get("sbs",
             `task/get/${params.sbsId}/${params.userId}/${params.tryId}`);
     },
+    getSbsComments(params) {
+        return ApiService.get("sbs",
+            `history/comments/${params.sbsId}`);
+    },
+    getSbsActions(params) {
+        return ApiService.get("sbs",
+            `history/actions/${params.sbsId}`);
+    },
     resolveSbsTask(params) {
         let form = new FormData();
 

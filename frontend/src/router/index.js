@@ -7,6 +7,8 @@ import HomeView from '../views/HomeView.vue'
 import SbsRunView from '../views/SbsRunView.vue'
 import SbsNotFoundView from '../views/SbsNotFoundView.vue'
 import SbsShowView from '../views/SbsShowView.vue'
+import SbsCommentsView from '../views/SbsCommentsView.vue'
+import SbsFinishedView from '../views/SbsFinishedView.vue'
 
 const router = createRouter({
   history: createWebHistory(
@@ -31,6 +33,11 @@ const router = createRouter({
       component: SbsNotFoundView
     },
     {
+      path: "/sbs/finished",
+      name: "sbsFinished",
+      component: SbsFinishedView
+    },
+    {
       path: "/sbs/show/:hash",
       name: "sbsshow",
       component: SbsShowView
@@ -38,6 +45,11 @@ const router = createRouter({
     {
       path: "/sbs/show",
       redirect: `/`
+    },
+    {
+      path: "/sbs/comments/:hash",
+      name: "sbscomments",
+      component: SbsCommentsView
     },
     {
       path: '/:pathMatch(.*)*',

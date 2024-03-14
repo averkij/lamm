@@ -16,13 +16,17 @@ import {
     SET_SBS_INFO,
     SET_SBS_STAT,
     SET_TASK,
-    SET_TRY_ID
+    SET_TRY_ID,
+    SET_SBS_COMMENTS,
+    SET_SBS_ACTIONS
 } from "./mutations.type"
 
 import {
     GET_SBS_INFO,
     GET_SBS_STAT,
     GET_TASK,
+    GET_SBS_COMMENTS,
+    GET_SBS_ACTIONS,
     RESOLVE_TASK,
 } from "./actions.type"
 
@@ -38,7 +42,9 @@ const initialState = {
     sbsTasks: [
         ["", "", "", "", ""]
     ],
-    sbsStat: []
+    sbsStat: [],
+    sbsComments: [],
+    sbsActions: []
 }
 
 export default createStore({
@@ -86,6 +92,28 @@ export default createStore({
             });
             return data;
         },
+        async [GET_SBS_COMMENTS](context, params) {
+            const {
+                data
+            } = await SbsService.getSbsComments({
+                "sbsId": params.sbsId
+            });
+            context.commit(SET_SBS_COMMENTS, {
+                data: data
+            });
+            return data;
+        },
+        async [GET_SBS_ACTIONS](context, params) {
+            const {
+                data
+            } = await SbsService.getSbsActions({
+                "sbsId": params.sbsId
+            });
+            context.commit(SET_SBS_ACTIONS, {
+                data: data
+            });
+            return data;
+        },
         async [RESOLVE_TASK](context, params) {
             const {
                 data
@@ -116,6 +144,12 @@ export default createStore({
         [SET_TASK](state, params) {
             state.sbsTasks = params.data["items"];
         },
+        [SET_SBS_COMMENTS](state, params) {
+            state.sbsComments = params.data["data"];
+        },
+        [SET_SBS_ACTIONS](state, params) {
+            state.sbsActions = params.data["data"];
+        },
         [SET_TRY_ID](state, params) {
             console.log("tryId:", params.tryId)
 
@@ -140,6 +174,12 @@ export default createStore({
         },
         sbsStat(state) {
             return state.sbsStat;
+        },
+        sbsComments(state) {
+            return state.sbsComments;
+        },
+        sbsActions(state) {
+            return state.sbsActions;
         },
     }
 })

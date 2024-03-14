@@ -5,6 +5,9 @@ import constants as con
 import helper
 
 
+# states: 0 - new, started, 3 - finished, stopped
+
+
 def create_db(sbs_guid, sbs_name, model_name_1, model_name_2, extra_data):
     """Init SBS database"""
     db_path = helper.get_sbs_path(sbs_guid)
@@ -104,6 +107,13 @@ def ensure_user_exists(sbs_guid, user_guid):
         )
 
 
+def update_sbs_state(sbs_guid, state):
+    """Update SBS state"""
+    db_path = helper.get_sbs_path(sbs_guid)
+    with sqlite3.connect(db_path) as db:
+        db.execute("update info set state=?", (state,))
+
+
 def get_tasks(sbs_guid, user_guid, try_id, n=1):
     """Get tasks for SBS"""
     db_path = helper.get_sbs_path(sbs_guid)
@@ -159,18 +169,6 @@ def resolve_task(sbs_guid, user_guid, task_id, try_id, event_id, comment):
     db_version = get_version(sbs_guid)
 
     with sqlite3.connect(db_path) as db:
-        # update get count for tasks (sort optimization)
-
-        if event_id != con.EVENT_SKIP:
-            db.execute(
-                """update tasks
-                    set
-                        answer_count = answer_count + 1
-                    where
-                        id = ?""",
-                (task_id,),
-            )
-
         # update history
         if db_version >= 0.3:
             db.execute(
@@ -185,6 +183,17 @@ def resolve_task(sbs_guid, user_guid, task_id, try_id, event_id, comment):
                         ?, ?, (select u.id from users u where u.guid=?),?,?
                     )""",
                 (task_id, try_id, user_guid, event_id, curr_time),
+            )
+
+        # update get count for tasks (sort optimization)
+        if event_id != con.EVENT_SKIP:
+            db.execute(
+                """update tasks
+                    set
+                        answer_count = answer_count + 1
+                    where
+                        id = ?""",
+                (task_id,),
             )
 
 
@@ -311,19 +320,34 @@ def patch_db(sbs_guid):
     db_path = helper.get_sbs_path(sbs_guid)
     db_version = get_version(sbs_guid)
 
-    # if db_version < float(con.DB_VERSION):
-    # add comment field to history table
-    with sqlite3.connect(db_path) as db:
-        col_comment_exists = db.execute(
-            "select count(*) as cnt from pragma_table_info('history') where name='comment'"
-        ).fetchone()[0]
+    if db_version < float(con.DB_VERSION):
+        # add comment field to history table
+        with sqlite3.connect(db_path) as db:
+            col_comment_exists = db.execute(
+                "select count(*) as cnt from pragma_table_info('history') where name='comment'"
+            ).fetchone()[0]
 
-        if col_comment_exists == 0:
-            db.execute("alter table history add column comment text")
+            if col_comment_exists == 0:
+                db.execute("alter table history add column comment text")
 
-    # update DB version
+        # update DB version
+        with sqlite3.connect(db_path) as db:
+            db.execute("update version set version = ?", (con.DB_VERSION,))
+
+
+def set_answer_counter(sbs_guid, task_id, counter):
+    """Set answer counter for a task"""
+    db_path = helper.get_sbs_path(sbs_guid)
+
     with sqlite3.connect(db_path) as db:
-        db.execute("update version set version = ?", (con.DB_VERSION,))
+        db.execute(
+            """update tasks
+                set
+                    answer_count = ?
+                where
+                    id = ?""",
+            (counter, task_id),
+        )
 
 
 def get_version(sbs_guid):

@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div v-if="taskTitle">
     <v-row class="mt-1">
-      <v-col cols="12" class="text-center text-h5">{{ taskTitle }}</v-col>
+      <v-col cols="12" class=""><div v-html="taskTitle"></div></v-col>
       <v-col cols="12"
         ><v-alert
           type="info"
@@ -147,9 +147,24 @@ export default defineComponent({
   },
   methods: {
     getSbsInfo() {
-      this.$store.dispatch(GET_SBS_INFO, {
-        sbsId: this.$route.params.hash,
-      });
+      this.$store
+        .dispatch(GET_SBS_INFO, {
+          sbsId: this.$route.params.hash,
+        })
+        .then(() => {
+          if (this.sbsInfo["state"] == 3) {
+            console.log("SBS finished.");
+            this.$router.push({
+              path: `/sbs/finished`,
+            });
+          }
+        })
+        .catch(() => {
+          console.log("Can not get task. SBS not found.");
+          this.$router.push({
+            path: `/sbs/nooooooooooooo`,
+          });
+        });
     },
     getNextTask() {
       this.isLoading = true;
@@ -161,7 +176,7 @@ export default defineComponent({
         })
         .then(() => {
           this.taskId = this.sbsTasks[0][0];
-          this.taskTitle = this.sbsTasks[0][1];
+          this.taskTitle = this.formatTaskTitle(this.sbsTasks[0][1]);
 
           if (this.swapAnswers) {
             this.taskLeft = this.sbsTasks[0][4];
@@ -172,7 +187,25 @@ export default defineComponent({
           }
 
           this.isLoading = false;
+        })
+        .catch(() => {
+          console.log("Can not get task. SBS not found.");
         });
+    },
+    formatTaskTitle(text) {
+      let res = `<span class='pre-wrap text-h5'>${text}</span>`;
+      let firstU = text.indexOf("U:");
+      let lastA = text.indexOf("A:");
+
+      if (firstU > 0 && lastA > 0) {
+        let prefix = text.substring(0, firstU + 2);
+        let postfix = text.substring(lastA, text.length);
+        let query = text.substring(firstU + 2, lastA);
+
+        res = `<span class='pre-wrap'>${prefix}</span><span class='text-h5 pre-wrap'>${query}</span><span class='pre-wrap'>${postfix}</span>`;
+      }
+
+      return res;
     },
     sendComment(comment, event) {
       this.commentInProgress = true;
