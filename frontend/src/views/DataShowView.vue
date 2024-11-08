@@ -3,6 +3,14 @@
     <v-row>
       <v-col cols="12"><div class="text-h4">Оценка данных</div></v-col>
     </v-row>
+
+    <v-row>
+      <v-col>
+        <div>
+          <v-img class="mt-10" :height="260" :src="getQrImg()"></v-img>
+        </div>
+      </v-col>
+    </v-row>
     
     <v-row class="mt-2">
       <v-col cols="12" sm="6">
@@ -57,6 +65,7 @@ import { defineComponent } from "vue";
 // Components
 import { mapGetters } from "vuex";
 import { GET_SBS_INFO, GET_SBS_STAT } from "@/store/actions.type";
+import { API_URL } from "@/common/config";
 import ApexCharts from "apexcharts";
 
 export default defineComponent({
@@ -67,6 +76,7 @@ export default defineComponent({
       chartRendered: false,
       chart: {},
       sbsRes: "",
+      API_URL,
     };
   },
   methods: {
@@ -136,6 +146,10 @@ export default defineComponent({
       this.$store.dispatch(GET_SBS_STAT, {
         sbsId: this.$route.params.hash,
       });
+    },
+    getQrImg() {
+      console.log(`${API_URL}static/img/${this.$route.params.hash}.png`)
+      return `${API_URL}static/img/${this.$route.params.hash}.png`;
     },
     renderChart() {
       let series = [

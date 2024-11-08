@@ -12,6 +12,8 @@ import helper
 from flask import Flask, abort, request, send_file
 from flask_cors import CORS
 
+import qrcode
+
 helper.configure_logging()
 
 # - /sbs/create
@@ -65,7 +67,7 @@ def sbs_create():
         ) as file_1:
             #temp hack
             items_1 = json.load(file_1) #flat list
-            items_1 = [[x,x] for x in items_1]
+            items_1 = [[x,""] for x in items_1]
             items_2 = items_1
     else:
         with open(
@@ -81,6 +83,9 @@ def sbs_create():
 
     db_helper.create_db(sbs_guid, sbs_name, model_name_1, model_name_2, extra_data)
     db_helper.fill_db(sbs_guid, items_1, items_2)
+    
+    img = qrcode.make(f"http://gm.pp.ru/data/check/{sbs_guid}")
+    img.save(f"static/img/{sbs_guid}.png")
 
     return {"id": sbs_guid}
 
