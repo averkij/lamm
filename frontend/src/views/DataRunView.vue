@@ -3,7 +3,8 @@
     <v-row class="mt-1">
       <v-col cols="12" class=""><div v-html="taskTitle"></div></v-col>
       </v-row
-    ><v-row class="mt-8">
+    >
+    <!-- <v-row class="mt-8">
       <v-col cols="12" sm="6"
         ><v-card elevation="1" class="pa-5 bg-yellow-lighten-5 pre-wrap">
           {{ taskLeft }}
@@ -14,55 +15,24 @@
           {{ taskRight }}
         </v-card></v-col
       >
-    </v-row>
-    <v-row>
+    </v-row> -->
+    <v-row class="mt-12">
       <v-col cols="12 mt-8 hidden-sm-and-down" class="text-center">
         <v-btn
-          color="blue"
           class="btn-main"
-          variant="tonal"
-          @click="vote('left')"
-          :disabled="isLoading"
-          >Левый лучше</v-btn
-        ><v-btn
-          class="ml-8 btn-main"
           color="green"
           variant="tonal"
           @click="vote('good')"
           :disabled="isLoading"
-          >Оба хорошие</v-btn
+          >Норм</v-btn
         ><v-btn
           class="ml-8 btn-main"
           color="red"
           variant="tonal"
           @click="vote('bad')"
           :disabled="isLoading"
-          >Оба плохие</v-btn
-        ><v-btn
-          class="ml-8 btn-main"
-          color="blue"
-          variant="tonal"
-          @click="vote('right')"
-          :disabled="isLoading"
-          >Правый лучше</v-btn
-        > </v-col
-      ><v-col cols="12 mt-8 hidden-md-and-up" class="text-center">
-        <v-btn
-          color="blue btn-main"
-          variant="tonal"
-          @click="vote('left')"
-          :disabled="isLoading"
-          ><span class="hidden-xs">Левый лучше</span
-          ><span class="hidden-sm-and-up">Верхний лучше</span></v-btn
-        ><v-btn
-          class="ml-8"
-          color="blue btn-main"
-          variant="tonal"
-          @click="vote('right')"
-          :disabled="isLoading"
-          ><span class="hidden-xs">Правый лучше</span
-          ><span class="hidden-sm-and-up">Нижний лучше</span></v-btn
-        > </v-col
+          >Фигня</v-btn
+        ></v-col
       ><v-col cols="12 mt-2 hidden-md-and-up" class="text-center"
         ><v-btn
           color="green"
@@ -70,14 +40,14 @@
           variant="tonal"
           @click="vote('good')"
           :disabled="isLoading"
-          >Оба хорошие</v-btn
+          >Норм</v-btn
         ><v-btn
           class="ml-8 btn-main"
           color="red"
           variant="tonal"
           @click="vote('bad')"
           :disabled="isLoading"
-          >Оба плохие</v-btn
+          >Фигня</v-btn
         >
       </v-col>
       <v-col cols="12 mt-2" class="text-center"
@@ -106,7 +76,6 @@
           @comment="sendComment"
           @close="showCommentDialog = false"
         />
-        <!-- :totalBatches="selectedProcessingTotalBatches" -->
       </v-col>
     </v-row>
   </div>

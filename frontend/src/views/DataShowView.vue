@@ -1,58 +1,9 @@
 <template>
   <div>
     <v-row>
-      <v-col cols="12"><div class="text-h4">Информация об SBS</div></v-col>
+      <v-col cols="12"><div class="text-h4">Оценка данных</div></v-col>
     </v-row>
-    <v-row class="mt-2">
-      <v-col cols="12" sm="6">
-        <v-card>
-          <v-table>
-            <tbody>
-              <!-- <tr>
-                <td>Дата создания</td>
-                <td>{{ sbsInfo["create_ts"] }}</td>
-              </tr> -->
-              <tr>
-                <td>Модель 1</td>
-                <td>{{ sbsInfo["model_1"] }}</td>
-              </tr>
-              <tr>
-                <td>Средняя длина ответа</td>
-                <td>{{ getExtra("avg_len_1") }}</td>
-              </tr>
-              <tr>
-                <td>Количество уворотов</td>
-                <td>{{ getExtra("sorry_1") }}</td>
-              </tr>
-            </tbody>
-          </v-table></v-card
-        >
-      </v-col>
-      <v-col cols="12" sm="6">
-        <v-card>
-          <v-table>
-            <tbody>
-              <tr>
-                <td>Модель 2</td>
-                <td>{{ sbsInfo["model_2"] }}</td>
-              </tr>
-              <tr>
-                <td>Средняя длина ответа</td>
-                <td>{{ getExtra("avg_len_2") }}</td>
-              </tr>
-              <tr>
-                <td>Количество уворотов</td>
-                <td>{{ getExtra("sorry_2") }}</td>
-              </tr>
-            </tbody>
-          </v-table>
-        </v-card>
-      </v-col>
-    </v-row>
-
-    <v-row class="mt-5">
-      <v-col cols="12"><div class="text-h4">Статус</div></v-col>
-    </v-row>
+    
     <v-row class="mt-2">
       <v-col cols="12" sm="6">
         <v-badge
@@ -74,32 +25,16 @@
           <v-table v-if="sbsStat.res">
             <tbody>
               <tr>
-                <td>Первый лучше</td>
-                <td>{{ sbsStat.res["1"] }}</td>
-              </tr>
-              <tr>
-                <td>Второй лучше</td>
-                <td>{{ sbsStat.res["2"] }}</td>
-              </tr>
-              <tr>
-                <td>Оба хорошие</td>
+                <td>Норм</td>
                 <td>{{ sbsStat.res["3"] }}</td>
               </tr>
               <tr>
-                <td>Оба плохие</td>
+                <td>Фигня</td>
                 <td>{{ sbsStat.res["4"] }}</td>
               </tr>
             </tbody>
           </v-table>
         </v-card>
-
-        <!-- <div>{{ sbsStat.res }}</div> -->
-
-        <!-- <ul>
-        <li v-for="(item, i) in sbsStat.data" :key="i">
-          {{ item }}
-        </li>
-      </ul> -->
       </v-col>
       <v-col cols="12" sm="6">
         <v-card class="pa-5 fill-height d-flex align-center justify-center">
@@ -174,19 +109,17 @@ export default defineComponent({
       this.sbsRes = `${sbs[0]} : ${sbs[1]}`;
     },
     calculateSbs(data) {
-      let model1 = data["1"];
-      let model2 = data["2"];
       let bothGood = data["3"];
-      // let bothBad = data["4"];
+      let bothBad = data["4"];
 
-      let total = model1 + model2 + bothGood;
+      let total = bothGood + bothBad;
 
       if (!total) {
         total = 1;
       }
 
-      let res1 = ((model1 + bothGood / 2) / total) * 100;
-      let res2 = ((model2 + bothGood / 2) / total) * 100;
+      let res1 = (bothGood / total) * 100;
+      let res2 = (bothBad / total) * 100;
       return [res1.toFixed(2), res2.toFixed(2)];
     },
     setUpdateTimer() {
@@ -207,20 +140,14 @@ export default defineComponent({
     renderChart() {
       let series = [
         {
-          name: this.sbsInfo["model_1"],
-          data: [this.sbsStat.res["1"]],
-        },
-        {
-          name: this.sbsInfo["model_2"],
-          data: [this.sbsStat.res["2"]],
-        },
-        {
-          name: "Обе хороши",
+          name: "Норм",
           data: [this.sbsStat.res["3"]],
+          color: "#3ae396"
         },
         {
-          name: "Обе плохи",
+          name: "Фигня",
           data: [this.sbsStat.res["4"]],
+          color: "#f54f12"
         },
       ];
       var options = {

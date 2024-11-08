@@ -15,7 +15,7 @@
         <v-spacer></v-spacer>
 
         <div>
-          <div v-if="!showSbsInfo" class="font-title">⚡️ GIGAMETR</div>
+          <div v-if="!showSbsInfo && !showDataInfo" class="font-title">⚡️ GIGAMETR</div>
           <div v-if="showSbsInfo">
             ⚡️
             <span class="font-weight-medium hidden-sm-and-down">
@@ -35,10 +35,24 @@
             <span class="font-weight-medium">{{ sbsInfo["total_tasks"] }}</span>
             <span class="hidden-sm-and-down"> заданий</span>
           </div>
+          <div v-if="showDataInfo">
+            ⚡️
+            <span class="font-weight-medium hidden-sm-and-down">
+              {{ sbsInfo["model_1"] }}</span
+            >            
+            <span class="hidden-sm-and-down">:</span>
+            <span class="hidden-sm-and-down"> выполнено </span>
+            <span class="font-weight-medium">{{
+              sbsInfo["solved_tasks"]
+            }}</span>
+            из
+            <span class="font-weight-medium">{{ sbsInfo["total_tasks"] }}</span>
+            <span class="hidden-sm-and-down"> заданий</span>
+          </div>
         </div>
         <v-spacer></v-spacer>
 
-        <v-btn v-if="showSbsInfo" icon>
+        <v-btn v-if="showSbsInfo || showDataInfo" icon>
           <v-icon @click="switchView">mdi-swap-horizontal</v-icon>
         </v-btn>
       </v-toolbar>
@@ -83,7 +97,13 @@ export default {
   computed: {
     ...mapGetters(["userId", "userName", "sbsInfo"]),
     showSbsInfo() {
-      if (this.sbsInfo && this.sbsInfo.model_1) {
+      if (this.sbsInfo && this.sbsInfo.model_1 && this.$route.name != "datarun" && this.$route.name != "datashow") {
+        return true;
+      }
+      return false;
+    },
+    showDataInfo() {
+      if (this.$route.name == "datarun" || this.$route.name == "datashow") {
         return true;
       }
       return false;
