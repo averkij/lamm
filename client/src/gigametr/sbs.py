@@ -102,8 +102,11 @@ def create(
 
     sbs_id = res["id"]
 
-    print(f"Done.\n\nSBS run: http://{address}/sbs/run/{sbs_id}")
-    print(f"SBS progress: http://{address}/sbs/show/{sbs_id}")
+    # print(f"Done.\n\nSBS run: http://{address}/sbs/run/{sbs_id}")
+    # print(f"SBS progress: http://{address}/sbs/show/{sbs_id}")
+
+    print(f"Done.\n\nSBS run: http://{address}/data/check/{sbs_id}")
+    print(f"SBS progress: http://{address}/data/show/{sbs_id}")
 
     return res
 
