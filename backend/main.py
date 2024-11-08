@@ -30,41 +30,52 @@ CORS(app)
 def sbs_create():
     """Upload data and create sbs object"""
 
-    sbs_name = request.form.get("name", "SBS")
-    model_name_1 = request.form.get("model_1", "model_1")
-    model_name_2 = request.form.get("model_2", "model_2")
-    filename_1 = request.form["filename_1"]
-    filename_2 = request.form["filename_2"]
-    extra_data = request.form.get("extra_data", "{}")
+    sbs_type = request.form.get("type", con.SBS_TYPE_DOUBLE)
 
     sbs_guid = uuid.uuid4().hex
-
+    
+    sbs_name = request.form.get("name", "SBS")
+    model_name_1 = request.form.get("model_1", "model_1")
+    #temp hack
+    model_name_2 = request.form.get("model_1", "model_1")
+    filename_1 = request.form["filename_1"]
+    extra_data = request.form.get("extra_data", "{}")
+    
+    if sbs_type==con.SBS_TYPE_DOUBLE:
+        model_name_2 = request.form.get("model_2", "model_2")
+        filename_2 = request.form["filename_2"]
+        
     upload_folder = os.path.join(con.DATA_FOLDER, sbs_guid)
     helper.check_folder(upload_folder)
 
     for model in request.files:
         file = request.files[model]
         filename = file.filename
-        # direction = request.form.get("direction", "from")
 
         logging.info(f"Loading document {file.filename}.")
         upload_path = os.path.join(upload_folder, filename)
-
-        # print(file)
-        # print(upload_path)
 
         file.save(upload_path)
 
         logging.info(f"Success. {filename} is loaded.")
 
-    with open(
-        os.path.join(upload_folder, filename_1), mode="r", encoding="utf-8"
-    ) as file_1:
+    if sbs_type==con.SBS_TYPE_SINGLE:
         with open(
-            os.path.join(upload_folder, filename_2), mode="r", encoding="utf-8"
-        ) as file_2:
-            items_1 = json.load(file_1)
-            items_2 = json.load(file_2)
+            os.path.join(upload_folder, filename_1), mode="r", encoding="utf-8"
+        ) as file_1:
+            #temp hack
+            items_1 = json.load(file_1) #flat list
+            items_1 = [[x,x] for x in items_1]
+            items_2 = items_1
+    else:
+        with open(
+            os.path.join(upload_folder, filename_1), mode="r", encoding="utf-8"
+        ) as file_1:
+            with open(
+                os.path.join(upload_folder, filename_2), mode="r", encoding="utf-8"
+            ) as file_2:
+                items_1 = json.load(file_1)
+                items_2 = json.load(file_2)
 
     helper.check_data(items_1, items_2)
 

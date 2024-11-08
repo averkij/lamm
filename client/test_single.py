@@ -2,14 +2,13 @@
 import src.gigametr as gm
 
 
-first_model = {"name": "gpt-3.5-turbo", "data": "./test_data/test_samples_1.json"}
-second_model = {"name": "giga-chat", "data": "./test_data/test_samples_2.json"}
+first_model = {"name": "GigaSFT", "data": "./test_data/test_samples_1_single.json"}
 
 
 # %%
 
 res = gm.sbs.create(
-    name="Test SBS 19", first=first_model, second=second_model, address="localhost"
+    name="Test data check 1", first=first_model, address="localhost", type="single"
 )
 
 # res = gm.sbs.create(

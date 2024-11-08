@@ -3,28 +3,37 @@ import os
 import json
 
 
+SBS_TYPE_SINGLE = "single"
+SBS_TYPE_DOUBLE = "sbs"
+
+
 def create(
-    name, first, second, address="localhost:80", sorry_words=["я не могу", "извините"]
+    name, first, second="", address="localhost:80", sorry_words=["я не могу", "извините"], type=SBS_TYPE_DOUBLE
 ):
     """Create SBS"""
-    if not "name" in first or not "name" in second:
+    if not "name" in first:
         print("Please, provide model names.")
         return
-
-    if not "data" in first or not "data" in second:
+    if not "data" in first:
         print("Please, provide paths to the files with data.")
         return
-
     if not os.path.isfile(first["data"]):
         print(f"{first['data']} does not exist")
         return
 
-    if not os.path.isfile(first["data"]):
-        print(f"{second['data']} does not exist")
-        return
+    if type == SBS_TYPE_DOUBLE:
+        if not "name" in second:
+            print("Please, provide model names.")
+            return
+        if not "data" in second:
+            print("Please, provide paths to the files with data.")
+            return
+        if not os.path.isfile(first["data"]):
+            print(f"{second['data']} does not exist")
+            return
 
     if not name:
-        print("Please, provide SBS name.")
+        print("Please, provide name of the test.")
         return
 
     print("Validating data...")
@@ -32,37 +41,58 @@ def create(
     with open(first["data"], "r", encoding="utf-8") as file1:
         content1 = json.load(file1)
 
-    with open(second["data"], "r", encoding="utf-8") as file2:
-        content2 = json.load(file2)
+    extra_data = {}
 
-    err = validate(content1, content2)
-    if err:
-        print(err)
-        return
+    if type == SBS_TYPE_DOUBLE:
+        with open(second["data"], "r", encoding="utf-8") as file2:
+            content2 = json.load(file2)
 
-    extra_data = {
-        "sorry_1": get_sorry(content1, sorry_words),
-        "sorry_2": get_sorry(content2, sorry_words),
-        "avg_len_1": avg_len(content1),
-        "avg_len_2": avg_len(content2),
-    }
+        err = validate(content1, content2)
+        if err:
+            print(err)
+            return
+
+        extra_data = {
+            "sorry_1": get_sorry(content1, sorry_words),
+            "sorry_2": get_sorry(content2, sorry_words),
+            "avg_len_1": avg_len(content1),
+            "avg_len_2": avg_len(content2),
+        }
 
     print(f"Uploading data to {address}...")
 
-    with open(first["data"], "rb") as file_1:
-        with open(second["data"], "rb") as file_2:
+    if type == SBS_TYPE_SINGLE:
+        with open(first["data"], "rb") as file_1:
             response = requests.post(
                 f"http://{address}/sbs/create",
                 data={
                     "name": name,
                     "model_1": first["name"],
-                    "model_2": second["name"],
                     "filename_1": os.path.basename(first["data"]),
-                    "filename_2": os.path.basename(second["data"]),
                     "extra_data": json.dumps(extra_data),
+                    "type": type
                 },
-                files={first["data"]: file_1, second["data"]: file_2},
+                files={first["data"]: file_1},
             )
+    elif type == SBS_TYPE_DOUBLE:
+        with open(first["data"], "rb") as file_1:
+            with open(second["data"], "rb") as file_2:
+                response = requests.post(
+                    f"http://{address}/sbs/create",
+                    data={
+                        "name": name,
+                        "model_1": first["name"],
+                        "model_2": second["name"],
+                        "filename_1": os.path.basename(first["data"]),
+                        "filename_2": os.path.basename(second["data"]),
+                        "extra_data": json.dumps(extra_data),
+                        "type": type
+                    },
+                    files={first["data"]: file_1, second["data"]: file_2},
+                )
+    else:
+        print('Provided type is not supported.')
+        return
 
     try:
         res = json.loads(response.content.decode("utf-8"))
