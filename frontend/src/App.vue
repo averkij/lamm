@@ -65,9 +65,17 @@ export default {
         this.$router.push({
           path: `/sbs/show/${this.$route.params.hash}`,
         });
+      } else if (this.$route.name == "datarun") {
+        this.$router.push({
+          path: `/data/show/${this.$route.params.hash}`,
+        });
       } else if (this.$route.name == "sbsshow") {
         this.$router.push({
           path: `/sbs/run/${this.$route.params.hash}`,
+        });
+      } else if (this.$route.name == "datashow") {
+        this.$router.push({
+          path: `/data/check/${this.$route.params.hash}`,
         });
       }
     },

@@ -10,6 +10,10 @@ import SbsShowView from '../views/SbsShowView.vue'
 import SbsCommentsView from '../views/SbsCommentsView.vue'
 import SbsFinishedView from '../views/SbsFinishedView.vue'
 
+import DataRunView from '../views/DataRunView.vue'
+import DataShowView from '../views/DataShowView.vue'
+import DataCommentsView from '../views/DataCommentsView.vue'
+
 const router = createRouter({
   history: createWebHistory(
     import.meta.env.BASE_URL),
@@ -50,6 +54,29 @@ const router = createRouter({
       path: "/sbs/comments/:hash",
       name: "sbscomments",
       component: SbsCommentsView
+    },
+    {
+      path: "/data/check/:hash",
+      name: "datarun",
+      component: DataRunView
+    },
+    {
+      path: "/data/check",
+      redirect: `/`
+    },
+    {
+      path: "/data/show/:hash",
+      name: "datashow",
+      component: DataShowView
+    },
+    {
+      path: "/data/show",
+      redirect: `/`
+    },
+    {
+      path: "/data/comments/:hash",
+      name: "datacomments",
+      component: DataCommentsView
     },
     {
       path: '/:pathMatch(.*)*',
