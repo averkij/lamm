@@ -36,9 +36,12 @@ with open("./test_data/demo_sample_100.jsonl", "r", encoding="utf8") as fin:
 
     for d in docs:
         acc = []
-        for m in d["messages"]:            
-            traniable_sign = "🟢" if m["trainable"] else "🔵"
-            acc.append(f"— {traniable_sign} [{m['role']}] {m['content']}")
+        for m in d["messages"]:
+            if "trainable" in m:
+                traniable_sign = " 🟢" if m["trainable"] else " 🔵"
+            else:
+                traniable_sign = ""
+            acc.append(f"—{traniable_sign} [{m['role']}] {m['content']}")
         text = "\n\n".join(acc)
         texts.append(text)
         meta.append(d["meta"])
@@ -63,6 +66,7 @@ import src.gigametr as gm
 
 
 first_model = {"name": "GigaSFT 1", "data": "./test_data/demo_100.json", "meta": "./test_data/demo_100_meta.json"}
+# first_model = {"name": "GigaSFT 1", "data": "./test_data/demo_100.json"}
 
 res = gm.sbs.create(
     name="Test data demo 1", first=first_model, address="localhost", type="single"
