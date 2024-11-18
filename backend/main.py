@@ -64,6 +64,11 @@ def sbs_create():
 
         logging.info(f"Success. {filename} is loaded.")
 
+    with open(
+            os.path.join(upload_folder, filename_1), mode="r", encoding="utf-8"
+        ) as file_1:
+            items_1 = json.load(file_1) # flat list
+
     if filename_meta_1:
         with open(
             os.path.join(upload_folder, filename_meta_1), mode="r", encoding="utf-8"
@@ -74,13 +79,9 @@ def sbs_create():
         meta_1 = ["{}"] * len(items_1)
 
     if sbs_type == con.SBS_TYPE_SINGLE:
-        with open(
-            os.path.join(upload_folder, filename_1), mode="r", encoding="utf-8"
-        ) as file_1:
-            # temp hack
-            items_1 = json.load(file_1)  # flat list
-            items_1 = [[x, "", y] for x, y in zip(items_1, meta_1)]
-            items_2 = items_1
+        # temp hack
+        items_1 = [[x, "", y] for x, y in zip(items_1, meta_1)]
+        items_2 = items_1
     else:
         if filename_meta_2:
             with open(
