@@ -26,7 +26,7 @@ res = gm.sbs.create(
     name="Test data check 1", first=first_model, address="gm.pp.ru", type="single"
 )
 # %%
-# save as plain list
+# save texts and meta
 import json
 
 with open("./test_data/demo_sample_100.jsonl", "r", encoding="utf8") as fin:
@@ -61,8 +61,8 @@ json.dump(
 )
 
 # %%
-# import gigametr as gm
-import src.gigametr as gm
+import gigametr as gm
+# import src.gigametr as gm
 
 
 first_model = {"name": "GigaSFT 1", "data": "./test_data/demo_100.json", "meta": "./test_data/demo_100_meta.json"}
@@ -76,13 +76,18 @@ print(f"\n\nhttp://localhost:5173/data/check/{res['id']}")
 
 
 # %%
-# import gigametr as gm
 
-# first_model = {"name": "GigaSFT", "data": "./test_data/demo_100.json"}
+#pip install gigametr==0.2.2
 
-# res = gm.sbs.create(
-#     name="Test data demo 1", first=first_model, address="gm.pp.ru", type="single"
-# )
+import gigametr as gm
+
+first_model = {"name": "GigaSFT 1", "data": "./test_data/demo_100.json", "meta": "./test_data/demo_100_meta.json"}
+
+res = gm.sbs.create(
+    name="Test data demo 1", first=first_model, address="gm.pp.ru", type="single"
+)
+
+
 # %%
 res
 # %%
