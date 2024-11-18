@@ -26,20 +26,33 @@ res = gm.sbs.create(
     name="Test data check 1", first=first_model, address="gm.pp.ru", type="single"
 )
 # %%
-#save as plain list
+# save as plain list
 import json
 
-with open('./test_data/demo_sample_100.jsonl', 'r', encoding='utf8') as fin:
+with open("./test_data/demo_sample_100.jsonl", "r", encoding="utf8") as fin:
     docs = [json.loads(x) for x in fin.read().splitlines()]
     res = []
 
     for d in docs:
-        text = [f"— [{x['role']}] {x['content']}" for x in d['messages']]
-        text = '\n\n'.join(text)
+        acc = ""
+        for m in d["messages"]:
+            traniable_sign = "🟢" if m["trainable"] else "⚪️"
+            acc += f"— [{m['role']}] {traniable_sign} {m['content']}"
+
+        # 🔵 ⚪️
+        # acc += f"— [{m['role']}]"
+        # text = [f"— [{x['role']}] {x['content']}" for x in d["messages"]]
+
+        text = "\n\n".join(acc)
 
         res.append(text)
 
-json.dump(res, open('./test_data/demo_100.json', 'w', encoding='utf8'), ensure_ascii=False, indent=4)        
+json.dump(
+    res,
+    open("./test_data/demo_100.json", "w", encoding="utf8"),
+    ensure_ascii=False,
+    indent=4,
+)
 
 # %%
 import gigametr as gm
@@ -55,6 +68,8 @@ print(f"\n\nhttp://localhost:5173/data/check/{res['id']}")
 
 
 # %%
+import gigametr as gm
+
 first_model = {"name": "GigaSFT", "data": "./test_data/demo_100.json"}
 
 res = gm.sbs.create(
