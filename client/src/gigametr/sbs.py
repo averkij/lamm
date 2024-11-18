@@ -8,7 +8,12 @@ SBS_TYPE_DOUBLE = "sbs"
 
 
 def create(
-    name, first, second="", address="localhost:80", sorry_words=["я не могу", "извините"], type=SBS_TYPE_DOUBLE
+    name,
+    first,
+    second="",
+    address="localhost:80",
+    sorry_words=["я не могу", "извините"],
+    type=SBS_TYPE_DOUBLE,
 ):
     """Create SBS"""
     if not "name" in first:
@@ -41,6 +46,15 @@ def create(
     with open(first["data"], "r", encoding="utf-8") as file1:
         content1 = json.load(file1)
 
+    meta_1_provided = False
+    meta_2_provided = False
+
+    if "meta" in first and os.path.isfile(first["meta"]):
+        meta_1_provided = True
+        with open(first["meta"], "r", encoding="utf-8") as file1_meta:
+            meta1 = json.load(file1_meta)
+            rb_meta1 = json.dumps(meta1).encode("utf-8")
+
     extra_data = {}
 
     if type == SBS_TYPE_DOUBLE:
@@ -59,39 +73,59 @@ def create(
             "avg_len_2": avg_len(content2),
         }
 
+        if "meta" in second and os.path.isfile(second["meta"]):
+            meta_2_provided = True
+            # rb_meta2 = json.dumps(["{}"] * len(content2)).encode("utf-8")
+            with open(second["meta"], "r", encoding="utf-8") as file2_meta:
+                meta2 = json.load(file2_meta)
+                rb_meta2 = json.dumps(meta2).encode("utf-8")
+
     print(f"Uploading data to {address}...")
 
     if type == SBS_TYPE_SINGLE:
         with open(first["data"], "rb") as file_1:
+            data = {
+                "name": name,
+                "model_1": first["name"],
+                "filename_1": os.path.basename(first["data"]),
+                "extra_data": json.dumps(extra_data),
+                "type": type,
+            }
+            files = {first["data"]: file_1}
+            if meta_1_provided:
+                data["filename_meta_1"] = os.path.basename(first["meta"])
+                files[data["filename_meta_1"]] = rb_meta1
             response = requests.post(
                 f"http://{address}/sbs/create",
-                data={
-                    "name": name,
-                    "model_1": first["name"],
-                    "filename_1": os.path.basename(first["data"]),
-                    "extra_data": json.dumps(extra_data),
-                    "type": type
-                },
-                files={first["data"]: file_1},
+                data=data,
+                files=files,
             )
     elif type == SBS_TYPE_DOUBLE:
         with open(first["data"], "rb") as file_1:
             with open(second["data"], "rb") as file_2:
+                data = {
+                    "name": name,
+                    "model_1": first["name"],
+                    "model_2": second["name"],
+                    "filename_1": os.path.basename(first["data"]),
+                    "filename_2": os.path.basename(second["data"]),
+                    "extra_data": json.dumps(extra_data),
+                    "type": type,
+                }
+                files = {first["data"]: file_1, second["data"]: file_2}
+                if meta_1_provided:
+                    data["filename_meta_1"] = os.path.basename(first["meta"])
+                    files[data["filename_meta_1"]] = rb_meta1
+                if meta_2_provided:
+                    data["filename_meta_2"] = os.path.basename(second["meta"])
+                    files[data["filename_meta_2"]] = rb_meta2
                 response = requests.post(
                     f"http://{address}/sbs/create",
-                    data={
-                        "name": name,
-                        "model_1": first["name"],
-                        "model_2": second["name"],
-                        "filename_1": os.path.basename(first["data"]),
-                        "filename_2": os.path.basename(second["data"]),
-                        "extra_data": json.dumps(extra_data),
-                        "type": type
-                    },
-                    files={first["data"]: file_1, second["data"]: file_2},
+                    data=data,
+                    files=files,
                 )
     else:
-        print('Provided type is not supported.')
+        print("Provided type is not supported.")
         return
 
     try:
