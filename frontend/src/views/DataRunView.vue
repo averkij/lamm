@@ -1,6 +1,12 @@
 <template>
   <div v-if="taskTitle">
-    <v-row class="mt-1">
+    <v-row class="mt-0 pt-0">
+      <v-col cols="12" class="text-left">
+        <span class="text-subtitle-1">Source: </span><span class="text-h6 source-title">{{ source_file }}</span>            
+      </v-col>
+    </v-row>
+
+    <v-row class="mt-4">
       <v-col cols="12" class=""><div v-html="taskTitle"></div></v-col>
       </v-row
     >
@@ -24,14 +30,14 @@
           variant="tonal"
           @click="vote('good')"
           :disabled="isLoading"
-          >Норм</v-btn
+          >База</v-btn
         ><v-btn
           class="ml-8 btn-main"
           color="red"
           variant="tonal"
           @click="vote('bad')"
           :disabled="isLoading"
-          >Фигня</v-btn
+          >Не база</v-btn
         ></v-col
       ><v-col cols="12 mt-2 hidden-md-and-up" class="text-center"
         ><v-btn
@@ -40,14 +46,14 @@
           variant="tonal"
           @click="vote('good')"
           :disabled="isLoading"
-          >Норм</v-btn
+          >База</v-btn
         ><v-btn
           class="ml-8 btn-main"
           color="red"
           variant="tonal"
           @click="vote('bad')"
           :disabled="isLoading"
-          >Фигня</v-btn
+          >Не база</v-btn
         >
       </v-col>
       <v-col cols="12 mt-2" class="text-center"
@@ -97,6 +103,7 @@ export default defineComponent({
       taskTitle: "",
       taskLeft: "",
       taskRight: "",
+      taskMeta: "{}",
       isLoading: false,
       swapAnswers: false,
       showCommentDialog: false,
@@ -135,6 +142,8 @@ export default defineComponent({
         .then(() => {
           this.taskId = this.sbsTasks[0][0];
           this.taskTitle = this.formatTaskTitle(this.sbsTasks[0][1]);
+          this.taskMeta = JSON.parse(this.sbsTasks[0][6]);
+          console.log("Task:", this.taskMeta);
 
           if (this.swapAnswers) {
             this.taskLeft = this.sbsTasks[0][4];
@@ -218,6 +227,12 @@ export default defineComponent({
   },
   computed: {
     ...mapGetters(["userId", "userName", "sbsInfo", "sbsTasks", "tryId"]),
+    source_file() {
+      if (!this.taskMeta || !this.taskMeta.source_file || this.taskMeta.source_file == null) {
+        return "";
+      }
+      return this.taskMeta.source_file;
+    },
   },
   mounted() {
     this.getSbsInfo();
