@@ -1,8 +1,8 @@
 <template>
   <div v-if="taskTitle">
-    <v-row class="mt-0 pt-0">
+    <v-row class="mt-0 pt-0" v-if="source_file">
       <v-col cols="12" class="text-left">
-        <span class="text-subtitle-1">Source: </span><span class="text-h6 source-title">{{ source_file }}</span>            
+        <span class="text-subtitle-1">Source: </span><span class="text-h6 ml-2 source-title">{{ source_file }}</span>            
       </v-col>
     </v-row>
 
