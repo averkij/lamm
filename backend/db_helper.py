@@ -36,7 +36,9 @@ def create_db(sbs_guid, sbs_name, model_name_1, model_name_2, extra_data):
                         answer_1 text,
                         answer_2 text,
                         get_count int default 0 NOT NULL,
-                        answer_count int default 0 NOT NULL
+                        answer_count int default 0 NOT NULL,
+                        meta_1 text default '{}' NOT NULL,
+                        meta_2 text default '{}' NOT NULL
                        )"""
             )
             db.execute(
@@ -82,13 +84,15 @@ def fill_db(sbs_guid, items_1, items_2):
     logging.info(f"Filling SBS db: {db_path}")
     with sqlite3.connect(db_path) as db:
         db.executemany(
-            "insert into tasks(question_1, question_2, answer_1, answer_2) values (?,?,?,?)",
+            "insert into tasks(question_1, question_2, answer_1, answer_2, meta_1, meta_2) values (?,?,?,?,?,?)",
             [
                 (
                     data_1[0],
                     data_2[0],
                     data_1[1],
                     data_2[1],
+                    data_1[2],
+                    data_2[2],
                 )
                 for data_1, data_2 in zip(items_1, items_2)
             ],
@@ -120,17 +124,31 @@ def get_tasks(sbs_guid, user_guid, try_id, n=1):
     curr_time = helper.get_curr_time()
 
     with sqlite3.connect(db_path) as db:
+        db_version = get_version(sbs_guid)
         # get tasks
-        tasks = db.execute(
-            f"""select
-                    t.id, t.question_1, t.question_2, t.answer_1, t.answer_2, t.answer_count
-                from
-                    tasks t
-                order
-                    by t.answer_count, t.get_count, t.id
-                limit ?""",
-            (n,),
-        ).fetchall()
+        print("DB VERSION", db_version)
+        if db_version >= 0.4:
+            tasks = db.execute(
+                f"""select
+                        t.id, t.question_1, t.question_2, t.answer_1, t.answer_2, t.answer_count, t.meta_1, t.meta_2
+                    from
+                        tasks t
+                    order
+                        by t.answer_count, t.get_count, t.id
+                    limit ?""",
+                (n,),
+            ).fetchall()
+        else:
+            tasks = db.execute(
+                f"""select
+                        t.id, t.question_1, t.question_2, t.answer_1, t.answer_2, t.answer_count
+                    from
+                        tasks t
+                    order
+                        by t.answer_count, t.get_count, t.id
+                    limit ?""",
+                (n,),
+            ).fetchall()
 
         task_ids = [x[0] for x in tasks]
 
@@ -159,7 +177,7 @@ def get_tasks(sbs_guid, user_guid, try_id, n=1):
             ],
         )
 
-    return [(x[0], x[1], x[2], x[3], x[4], x[5]) for x in tasks]
+    return tasks
 
 
 def resolve_task(sbs_guid, user_guid, task_id, try_id, event_id, comment):
@@ -261,8 +279,36 @@ def get_history(sbs_guid, event_ids=[1, 2, 3, 4]):
     db_path = helper.get_sbs_path(sbs_guid)
     db_version = get_version(sbs_guid)
 
-    # comments are available in 0.3+
-    if db_version >= 0.3:
+    # meta is available in 0.4
+    if db_version >= 0.4:
+        with sqlite3.connect(db_path) as db:
+            data = db.execute(
+                """select
+                        h.task_id,
+                        u.guid,
+                        t.question_1,
+                        t.question_2,
+                        t.answer_1,
+                        t.answer_2,
+                        h.event_id,
+                        h.insert_ts,
+                        h.comment,
+                        t.meta_1,
+                        t.meta_2,
+                    from
+                        history h
+                            join tasks t on t.id = h.task_id
+                            join users u on u.id = h.user_id
+                    where
+                        h.event_id in ({0})
+                    order by
+                        h.task_id""".format(
+                    ",".join("?" * len(event_ids))
+                ),
+                event_ids,
+            ).fetchall()
+    # comments are available in 0.3
+    elif db_version >= 0.3:
         with sqlite3.connect(db_path) as db:
             data = db.execute(
                 """select

@@ -33,20 +33,23 @@ def sbs_create():
     """Upload data and create sbs object"""
 
     sbs_type = request.form.get("type", con.SBS_TYPE_DOUBLE)
-
     sbs_guid = uuid.uuid4().hex
-    
+
     sbs_name = request.form.get("name", "SBS")
     model_name_1 = request.form.get("model_1", "model_1")
-    #temp hack
+
+    # temp hack
     model_name_2 = request.form.get("model_1", "model_1")
     filename_1 = request.form["filename_1"]
     extra_data = request.form.get("extra_data", "{}")
-    
-    if sbs_type==con.SBS_TYPE_DOUBLE:
+
+    filename_meta_1 = request.form.get("filename_meta_1", None)
+    filename_meta_2 = request.form.get("filename_meta_2", None)
+
+    if sbs_type == con.SBS_TYPE_DOUBLE:
         model_name_2 = request.form.get("model_2", "model_2")
         filename_2 = request.form["filename_2"]
-        
+
     upload_folder = os.path.join(con.DATA_FOLDER, sbs_guid)
     helper.check_folder(upload_folder)
 
@@ -61,15 +64,33 @@ def sbs_create():
 
         logging.info(f"Success. {filename} is loaded.")
 
-    if sbs_type==con.SBS_TYPE_SINGLE:
+    if filename_meta_1:
+        with open(
+            os.path.join(upload_folder, filename_meta_1), mode="r", encoding="utf-8"
+        ) as file_meta_1:
+            meta_1 = json.load(file_meta_1)
+            meta_1 = [json.dumps(x, ensure_ascii=False) for x in meta_1]
+    else:
+        meta_1 = ["{}"] * len(items_1)
+
+    if sbs_type == con.SBS_TYPE_SINGLE:
         with open(
             os.path.join(upload_folder, filename_1), mode="r", encoding="utf-8"
         ) as file_1:
-            #temp hack
-            items_1 = json.load(file_1) #flat list
-            items_1 = [[x,""] for x in items_1]
+            # temp hack
+            items_1 = json.load(file_1)  # flat list
+            items_1 = [[x, "", y] for x, y in zip(items_1, meta_1)]
             items_2 = items_1
     else:
+        if filename_meta_2:
+            with open(
+                os.path.join(upload_folder, filename_meta_2), mode="r", encoding="utf-8"
+            ) as file_meta_2:
+                meta_2 = json.load(file_meta_2)
+                meta_2 = [json.dumps(x, ensure_ascii=False) for x in meta_2]
+        else:
+            meta_2 = ["{}"] * len(items_2)
+
         with open(
             os.path.join(upload_folder, filename_1), mode="r", encoding="utf-8"
         ) as file_1:
@@ -77,13 +98,15 @@ def sbs_create():
                 os.path.join(upload_folder, filename_2), mode="r", encoding="utf-8"
             ) as file_2:
                 items_1 = json.load(file_1)
+                items_1 = [[x[0], x[1], y] for x, y in zip(items_1, meta_1)]
                 items_2 = json.load(file_2)
+                items_2 = [[x[0], x[1], y] for x, y in zip(items_2, meta_2)]
 
     helper.check_data(items_1, items_2)
 
     db_helper.create_db(sbs_guid, sbs_name, model_name_1, model_name_2, extra_data)
     db_helper.fill_db(sbs_guid, items_1, items_2)
-    
+
     img = qrcode.make(f"http://gm.pp.ru/data/check/{sbs_guid}")
     img.save(f"static/img/{sbs_guid}.png")
 
@@ -106,10 +129,26 @@ def get_task(sbs_guid, user_guid, try_id):
 
     logging.info(f"Getting task for SBS. sbs_guid: {sbs_guid}.")
 
+    db_version = db_helper.get_version(sbs_guid)
+
     db_helper.ensure_user_exists(sbs_guid, user_guid)
     tasks = db_helper.get_tasks(sbs_guid, user_guid, try_id)
 
-    return {"items": tasks}
+    res = [
+        (
+            x[0],
+            x[1],
+            x[2],
+            x[3],
+            x[4],
+            x[5],
+            x[6] if db_version >= 0.4 else '{"meta": -1}',
+            x[7] if db_version >= 0.4 else '{"meta": -1}',
+        )
+        for x in tasks
+    ]
+
+    return {"items": res}
 
 
 @app.route("/sbs/task/resolve", methods=["POST"])
