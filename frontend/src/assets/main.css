@@ -41,3 +41,10 @@ p {
 /* .main-toolbar {
   background-color: black !important;
 }  */
+
+.source-title {
+  background-color: #eee;
+  border-radius: 10px;
+  padding: 10px;
+  color: #555;
+}
