@@ -1,0 +1,602 @@
+[
+    {
+        "source_file": "summarize_lessons_sberedu_32k",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "summarize_lessons_sberedu_32k"
+    },
+    {
+        "source_file": "llm_arena",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "prod"
+    },
+    {
+        "source_file": "salute_persons",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "renata_system"
+    },
+    {
+        "source_file": "math_easy_TS_rephrased",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "empty"
+    },
+    {
+        "source_file": "doc2json_doverennosti_28022024",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "846"
+    },
+    {
+        "source_file": "mmlu_eng_sample",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "2760"
+    },
+    {
+        "source_file": "domclick",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "domclick"
+    },
+    {
+        "source_file": "winograde_short",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "2725"
+    },
+    {
+        "source_file": "orca",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "2711"
+    },
+    {
+        "source_file": "general_safety_dialog_creation",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "prod_new"
+    },
+    {
+        "source_file": "math_medium_TS",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "prod"
+    },
+    {
+        "source_file": "orca",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "2711"
+    },
+    {
+        "source_file": "tenders",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "2229"
+    },
+    {
+        "source_file": "orca",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "2706"
+    },
+    {
+        "source_file": "krasota",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "prod"
+    },
+    {
+        "source_file": "data_sherlock_sber_v20",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "Sber"
+    },
+    {
+        "source_file": "orca",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "2706"
+    },
+    {
+        "source_file": "chemistry_easy",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "empty"
+    },
+    {
+        "source_file": "orca_mixed",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "2713"
+    },
+    {
+        "source_file": "salute_set_reminder_syn",
+        "mix": false,
+        "repetitions": 3,
+        "system_index": "assistant_ftf"
+    },
+    {
+        "source_file": "mmlu_eng_sample",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "2715"
+    },
+    {
+        "source_file": "ssu_therapy",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "3115"
+    },
+    {
+        "source_file": "b2c",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "prod"
+    },
+    {
+        "source_file": "text2video_refusal",
+        "mix": true,
+        "repetitions": 1,
+        "system_index": "prod"
+    },
+    {
+        "source_file": "poetry",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "prod"
+    },
+    {
+        "source_file": "krasota",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "empty"
+    },
+    {
+        "source_file": "doctord_closed_qa_parsed_one_choice",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "110"
+    },
+    {
+        "source_file": "salute_boltalka",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "assistant_fts"
+    },
+    {
+        "source_file": "krasota",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "empty"
+    },
+    {
+        "source_file": "salute_boltalka",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "assistant_mvf"
+    },
+    {
+        "source_file": "krasota",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "prod"
+    },
+    {
+        "source_file": "krasota",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "empty"
+    },
+    {
+        "source_file": "salute_censor",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "assistant_fvs"
+    },
+    {
+        "source_file": "data_sherlock_joy_v20",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "Joy"
+    },
+    {
+        "source_file": "krasota",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "prod"
+    },
+    {
+        "source_file": "salute_get_time_difference_syn",
+        "mix": false,
+        "repetitions": 3,
+        "system_index": "assistant_mvs"
+    },
+    {
+        "source_file": "redactor_dialogs",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "3181"
+    },
+    {
+        "source_file": "salute_ranker_aug",
+        "mix": false,
+        "repetitions": 3,
+        "system_index": "assistant_ftf"
+    },
+    {
+        "source_file": "gsm8k",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "empty"
+    },
+    {
+        "source_file": "salute_reminder_context",
+        "mix": false,
+        "repetitions": 3,
+        "system_index": "assistant_ftf"
+    },
+    {
+        "source_file": "krasota",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "empty"
+    },
+    {
+        "source_file": "action_points_outlook_abc_prompt=mail_action_points_v0_short.txt",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "851"
+    },
+    {
+        "source_file": "redactor",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "empty"
+    },
+    {
+        "source_file": "32k_docs",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "prod"
+    },
+    {
+        "source_file": "text2image_mix",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "prod"
+    },
+    {
+        "source_file": "text2image_mix",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "prod"
+    },
+    {
+        "source_file": "orca",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "2711"
+    },
+    {
+        "source_file": "salute_boltalka",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "assistant_mvf"
+    },
+    {
+        "source_file": "MATH_CoT",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "empty"
+    },
+    {
+        "source_file": "krasota",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "prod"
+    },
+    {
+        "source_file": "lmsys-chat-1m-ru",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "prod"
+    },
+    {
+        "source_file": "idp_search_short_prompt",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "idp_search_short_prompt"
+    },
+    {
+        "source_file": "biology_medium",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "empty"
+    },
+    {
+        "source_file": "salute_censor",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "assistant_ftf"
+    },
+    {
+        "source_file": "prod",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "2958"
+    },
+    {
+        "source_file": "llm_arena",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "empty"
+    },
+    {
+        "source_file": "winograde_short",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "2725"
+    },
+    {
+        "source_file": "code_wizard",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "empty"
+    },
+    {
+        "source_file": "orca",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "2706"
+    },
+    {
+        "source_file": "translation",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "2730"
+    },
+    {
+        "source_file": "32k_docs",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "prod"
+    },
+    {
+        "source_file": "gsm8k",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "empty"
+    },
+    {
+        "source_file": "fuses_video_v1",
+        "mix": true,
+        "repetitions": 1,
+        "system_index": "prod"
+    },
+    {
+        "source_file": "orca",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "2713"
+    },
+    {
+        "source_file": "chats_with_system",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "2355"
+    },
+    {
+        "source_file": "redactor_dialogs",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "3181"
+    },
+    {
+        "source_file": "search_markup_23_10",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "1198"
+    },
+    {
+        "source_file": "2gis",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "843"
+    },
+    {
+        "source_file": "tenders",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "2230"
+    },
+    {
+        "source_file": "ru_lang_syn_skip",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "empty"
+    },
+    {
+        "source_file": "domclick",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "domclick"
+    },
+    {
+        "source_file": "orca",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "2706"
+    },
+    {
+        "source_file": "redactor_dialogs",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "3181"
+    },
+    {
+        "source_file": "lmsys-chat-1m-ru",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "prod"
+    },
+    {
+        "source_file": "salute_turn_on_music_pos_pattern",
+        "mix": false,
+        "repetitions": 3,
+        "system_index": "assistant_fvf"
+    },
+    {
+        "source_file": "lmsys-chat-1m-ru",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "prod"
+    },
+    {
+        "source_file": "krasota",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "prod"
+    },
+    {
+        "source_file": "world_around_creation",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "prod"
+    },
+    {
+        "source_file": "summarize_lessons_sberedu_32k",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "summarize_lessons_sberedu_32k"
+    },
+    {
+        "source_file": "8k_qa",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "prod"
+    },
+    {
+        "source_file": "krasota",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "empty"
+    },
+    {
+        "source_file": "krasota",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "prod"
+    },
+    {
+        "source_file": "fuses_video_v1",
+        "mix": true,
+        "repetitions": 1,
+        "system_index": "prod"
+    },
+    {
+        "source_file": "MATH",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "empty"
+    },
+    {
+        "source_file": "math_medium_TS",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "prod"
+    },
+    {
+        "source_file": "orca",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "2714"
+    },
+    {
+        "source_file": "orca",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "2708"
+    },
+    {
+        "source_file": "ege_part_a_long",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "112"
+    },
+    {
+        "source_file": "8k_qa",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "empty"
+    },
+    {
+        "source_file": "mmlu_eng_sample",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "2760"
+    },
+    {
+        "source_file": "redactor",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "empty"
+    },
+    {
+        "source_file": "chats_with_system",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "2622"
+    },
+    {
+        "source_file": "redactor_dialogs",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "prod"
+    },
+    {
+        "source_file": "krasota",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "prod"
+    },
+    {
+        "source_file": "orca",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "2711"
+    },
+    {
+        "source_file": "lmsys-chat-1m-ru",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "prod"
+    },
+    {
+        "source_file": "informative_notes_outlook_prompt=mail_informative_notes_short.txt_INCREMENT",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "847"
+    },
+    {
+        "source_file": "MATH",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "empty"
+    },
+    {
+        "source_file": "tenders",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "2230"
+    },
+    {
+        "source_file": "ru_lang_syn sample_pool_letter_edits_sent_clean_space_inserts_sent",
+        "mix": false,
+        "repetitions": 1,
+        "system_index": "empty"
+    }
+]

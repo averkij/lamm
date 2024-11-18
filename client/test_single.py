@@ -31,34 +31,38 @@ import json
 
 with open("./test_data/demo_sample_100.jsonl", "r", encoding="utf8") as fin:
     docs = [json.loads(x) for x in fin.read().splitlines()]
-    res = []
+    texts = []
+    meta = []
 
     for d in docs:
-        acc = ""
-        for m in d["messages"]:
-            traniable_sign = "🟢" if m["trainable"] else "⚪️"
-            acc += f"— [{m['role']}] {traniable_sign} {m['content']}"
-
-        # 🔵 ⚪️
-        # acc += f"— [{m['role']}]"
-        # text = [f"— [{x['role']}] {x['content']}" for x in d["messages"]]
-
+        acc = []
+        for m in d["messages"]:            
+            traniable_sign = "🟢" if m["trainable"] else "🔵"
+            acc.append(f"— {traniable_sign} [{m['role']}] {m['content']}")
         text = "\n\n".join(acc)
-
-        res.append(text)
+        texts.append(text)
+        meta.append(d["meta"])
 
 json.dump(
-    res,
+    texts,
     open("./test_data/demo_100.json", "w", encoding="utf8"),
     ensure_ascii=False,
     indent=4,
 )
 
+json.dump(
+    meta,
+    open("./test_data/demo_100_meta.json", "w", encoding="utf8"),
+    ensure_ascii=False,
+    indent=4,
+)
+
 # %%
-import gigametr as gm
+# import gigametr as gm
+import src.gigametr as gm
 
 
-first_model = {"name": "GigaSFT 1", "data": "./test_data/demo_100.json"}
+first_model = {"name": "GigaSFT 1", "data": "./test_data/demo_100.json", "meta": "./test_data/demo_100_meta.json"}
 
 res = gm.sbs.create(
     name="Test data demo 1", first=first_model, address="localhost", type="single"
@@ -68,11 +72,13 @@ print(f"\n\nhttp://localhost:5173/data/check/{res['id']}")
 
 
 # %%
-import gigametr as gm
+# import gigametr as gm
 
-first_model = {"name": "GigaSFT", "data": "./test_data/demo_100.json"}
+# first_model = {"name": "GigaSFT", "data": "./test_data/demo_100.json"}
 
-res = gm.sbs.create(
-    name="Test data demo 1", first=first_model, address="gm.pp.ru", type="single"
-)
+# res = gm.sbs.create(
+#     name="Test data demo 1", first=first_model, address="gm.pp.ru", type="single"
+# )
+# %%
+res
 # %%
