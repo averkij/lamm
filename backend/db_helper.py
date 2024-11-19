@@ -294,7 +294,7 @@ def get_history(sbs_guid, event_ids=[1, 2, 3, 4]):
                         h.insert_ts,
                         h.comment,
                         t.meta_1,
-                        t.meta_2,
+                        t.meta_2
                     from
                         history h
                             join tasks t on t.id = h.task_id
