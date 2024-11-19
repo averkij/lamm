@@ -87,7 +87,40 @@ res = gm.sbs.create(
     name="Test data demo 1", first=first_model, address="gm.pp.ru", type="single"
 )
 
+# %%
+#GET COMMENTS
+import gigametr as gm
+import json
+
+sbs_guid = "417d79e90ad843e29d62846730b79e15"
+
+comments = gm.sbs.get_comments(sbs_guid=sbs_guid, address="gm.pp.ru")
+
+json.dump(comments, open(f'./comments_{sbs_guid}.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=4)
+
 
 # %%
-res
+#GET RESULTS
+import gigametr as gm
+import json
+
+sbs_guid = "417d79e90ad843e29d62846730b79e15"
+
+actions = gm.sbs.get_actions(sbs_guid=sbs_guid, address="gm.pp.ru")
+
+actions = [{'id': x['id'], 'prompt': x['prompt_1'], 'res': 'Не база'} for x in actions['data'] if x['res'] == 'both_bad']
+
+for a in actions:
+    c = [x for x in comments['data'] if x['id'] == a['id']]
+    if c:
+        a['comment'] = c[0]['comment']
+
+
+json.dump(actions, open(f'./no_baza_{sbs_guid}.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=4)
+
+
+# %%
+comments
+# %%
+actions
 # %%
