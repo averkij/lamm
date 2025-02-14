@@ -223,7 +223,7 @@ def escape_nonvalid_html_tags(text: str) -> str:
 import json
 
 
-filename = "./test_data/demo_100_test_brackets.json"
+filename = "./test_data/gemba_sft_27.1.json"
 
 texts = json.load(open(filename, "r", encoding="utf8"))
 
@@ -235,7 +235,7 @@ texts = [escape_nonvalid_html_tags(x) for x in texts]
 json.dump(
     texts,
     open(filename.replace(".json", "_escaped.json"), "w", encoding="utf8"),
-    ensure_ascii=False
+    ensure_ascii=False,
 )
 
 # %%
