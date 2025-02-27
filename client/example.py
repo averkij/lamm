@@ -50,8 +50,12 @@ for domain in domains:
     )
 
 
+#%%
+# 2. do escape html tags
 
 # %%
+# 3. upload
+
 import src.gigametr as gm
 import time
 
@@ -75,35 +79,3 @@ for domain in domains:
 # http://gm.pp.ru/data/check/04404b87e85242f4ae9ee5be3c025d53
 # http://gm.pp.ru/data/check/ff9abf6da37a4cfd9648e62a8a0e7f50
 # http://gm.pp.ru/data/check/bbba2163b29a49bc90d6cce970a3c9a5
-
-#%%
-# 2. do escape html tags
-
-# %%
-# 3. upload
-
-texts2 = []
-metas2 = []
-
-with open("./test_data/gemba_sft_27.1_escaped.json", "r", encoding="utf8") as fin:
-    with open("./test_data/gemba_sft_27.1_meta.json", "r", encoding="utf8") as fin_meta:
-        texts = json.load(fin)
-        metas = json.load(fin_meta)
-
-        for t, m in zip(texts, metas):
-            if m["source_file"] == "lmsys-chat-1m-ru_marked":
-                texts2.append(t)
-                metas2.append(m)
-
-print(len(texts2), len(metas2))
-
-json.dump(
-    texts2,
-    open("./test_data/gemba_sft_27.1_lmsys.json", "w", encoding="utf8"),
-    ensure_ascii=False,
-)
-json.dump(
-    metas2,
-    open("./test_data/gemba_sft_27.1_meta_lmsys.json", "w", encoding="utf8"),
-    ensure_ascii=False,
-)
