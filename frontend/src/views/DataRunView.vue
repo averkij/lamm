@@ -1,15 +1,33 @@
 <template>
-  <div v-if="taskTitle">
+  <div v-if="taskText">
     <v-row class="mt-0 pt-0" v-if="source_file">
-      <v-col cols="12" class="text-left">
-        <span class="text-subtitle-1">Source: </span><span class="text-h6 ml-2 source-title">{{ source_file }}</span>            
+      <v-col cols="10" class="text-left">
+        <span class="text-subtitle-1">Source: </span
+        ><span class="text-h6 ml-2 source-title">{{ source_file }}</span>
+      </v-col>
+      <v-col cols="2" class="text-right">
+        <v-switch
+          v-model="renderMarkdown"
+          color="primary"
+          label="Render markdown"
+          hide-details
+          density="compact"
+        ></v-switch>
       </v-col>
     </v-row>
 
+    <!-- <div>{{ taskText }}</div> -->
+
     <v-row class="mt-4">
-      <v-col cols="12" class=""><div v-html="taskTitle"></div></v-col>
-      </v-row
-    >
+      <!-- condition class text-h5 -->
+      <v-col
+        cols="12"
+        class="text-h5"
+        :class="{ 'markdown-content': renderMarkdown, 'pre-wrap': !renderMarkdown }"
+        ><div v-html="displayText"></div
+      ></v-col>
+    </v-row>
+
     <!-- <v-row class="mt-8">
       <v-col cols="12" sm="6"
         ><v-card elevation="1" class="pa-5 bg-yellow-lighten-5 pre-wrap">
@@ -94,13 +112,14 @@ import { defineComponent } from "vue";
 import { mapGetters } from "vuex";
 import { GET_SBS_INFO, GET_TASK, RESOLVE_TASK } from "@/store/actions.type";
 import CommentDialog from "@/components/CommentDialog.vue";
+import { marked } from "marked";
 
 export default defineComponent({
   name: "DataRunView",
   data() {
     return {
       taskId: "",
-      taskTitle: "",
+      taskText: "",
       taskLeft: "",
       taskRight: "",
       taskMeta: "{}",
@@ -108,6 +127,7 @@ export default defineComponent({
       swapAnswers: false,
       showCommentDialog: false,
       commentInProgress: false,
+      renderMarkdown: false,
     };
   },
   methods: {
@@ -141,7 +161,7 @@ export default defineComponent({
         })
         .then(() => {
           this.taskId = this.sbsTasks[0][0];
-          this.taskTitle = this.formatTaskTitle(this.sbsTasks[0][1]);
+          this.taskText = this.formatTaskText(this.sbsTasks[0][1]);
           this.taskMeta = JSON.parse(this.sbsTasks[0][6]);
           console.log("Task:", this.taskMeta);
 
@@ -159,20 +179,41 @@ export default defineComponent({
           console.log("Can not get task. SBS not found.");
         });
     },
-    formatTaskTitle(text) {
-      let res = `<span class='pre-wrap text-h5'>${text}</span>`;
-      let firstU = text.indexOf("U:");
-      let lastA = text.indexOf("A:");
+    formatTaskText(text) {
+      // let res = `<span class='pre-wrap text-h5'>${text}</span>`;
+      // let firstU = text.indexOf("U:");
+      // let lastA = text.indexOf("A:");
 
-      if (firstU > 0 && lastA > 0) {
-        let prefix = text.substring(0, firstU + 2);
-        let postfix = text.substring(lastA, text.length);
-        let query = text.substring(firstU + 2, lastA);
+      // if (firstU > 0 && lastA > 0) {
+      //   let prefix = text.substring(0, firstU + 2);
+      //   let postfix = text.substring(lastA, text.length);
+      //   let query = text.substring(firstU + 2, lastA);
 
-        res = `<span class='pre-wrap'>${prefix}</span><span class='text-h5 pre-wrap'>${query}</span><span class='pre-wrap'>${postfix}</span>`;
-      }
+      //   res = `<span class='pre-wrap'>${prefix}</span><span class='text-h5 pre-wrap'>${query}</span><span class='pre-wrap'>${postfix}</span>`;
+      // }
 
-      return res;
+      // return res;
+      return text;
+    },
+    renderAsMarkdown(text) {
+      // Extract the HTML content from the formatting structure
+      // let content = text;
+
+      // // Simple regex to extract text from HTML spans
+      // const htmlRegex = /<span[^>]*>(.*?)<\/span>/g;
+      // let matches = [];
+      // let match;
+      // while ((match = htmlRegex.exec(text)) !== null) {
+      //   matches.push(match[1]);
+      // }
+
+      // if (matches.length > 0) {
+      //   // Join all extracted content
+      //   content = matches.join('');
+      // }
+
+      // Render the content as markdown
+      return marked(text);
     },
     sendComment(comment, event) {
       this.commentInProgress = true;
@@ -228,10 +269,20 @@ export default defineComponent({
   computed: {
     ...mapGetters(["userId", "userName", "sbsInfo", "sbsTasks", "tryId"]),
     source_file() {
-      if (!this.taskMeta || !this.taskMeta.source_file || this.taskMeta.source_file == null) {
+      if (
+        !this.taskMeta ||
+        !this.taskMeta.source_file ||
+        this.taskMeta.source_file == null
+      ) {
         return "";
       }
       return this.taskMeta.source_file;
+    },
+    displayText() {
+      if (this.renderMarkdown) {
+        return this.renderAsMarkdown(this.taskText);
+      }
+      return this.taskText;
     },
   },
   mounted() {
@@ -241,3 +292,37 @@ export default defineComponent({
   components: { CommentDialog },
 });
 </script>
+
+<style scoped>
+.markdown-content :deep(p) {
+  text-indent: 0px !important;
+}
+
+.markdown-content :deep(ol) {
+  padding-left: 20px;
+  margin-bottom: 1em;
+}
+
+.markdown-content :deep(ul) {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin-bottom: 1em;
+}
+
+.markdown-content :deep(p) {
+  line-height: 1.6;
+}
+
+.markdown-content :deep(h3) {
+
+  margin-bottom: 1em;
+}
+
+div {
+  line-height: 1.5;
+}
+
+.markdown-content :deep(p:not(:last-child)) {
+  margin-bottom: 0.6em;
+}
+</style>

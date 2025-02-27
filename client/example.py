@@ -6,6 +6,8 @@ import json
 
 
 domains = ["krasota", "travel_creation", "synonims_list", "samopoznanie", "pretrain_hf"]
+
+#%%
 for domain in domains:
     input_file = f"./test_data/{domain}_questionable.json"
     with open(
@@ -59,7 +61,7 @@ for domain in domains:
 import src.gigametr as gm
 import time
 
-for domain in domains:
+for domain in domains[:1]:
     first_model = {
         "name": f"{domain}",
         "data": f"./test_data/gemba_4_{domain}_escaped.json",
@@ -67,7 +69,8 @@ for domain in domains:
     }
 
     res = gm.sbs.create(
-        name=f"Gemba 4. {domain}", first=first_model, address="gm.pp.ru", type="single"
+        name=f"Gemba 4. {domain}", first=first_model, address="localhost", type="single"
+        # name=f"Gemba 4. {domain}", first=first_model, address="gm.pp.ru", type="single"
     )
 
     print(f"\n\nhttp://gm.pp.ru/data/check/{res['id']}")
@@ -79,3 +82,8 @@ for domain in domains:
 # http://gm.pp.ru/data/check/04404b87e85242f4ae9ee5be3c025d53
 # http://gm.pp.ru/data/check/ff9abf6da37a4cfd9648e62a8a0e7f50
 # http://gm.pp.ru/data/check/bbba2163b29a49bc90d6cce970a3c9a5
+
+# %%
+# http://localhost:5173/data/check/ddecfa51b13c40fc8c56e462d628b769
+
+
