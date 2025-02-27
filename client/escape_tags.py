@@ -208,12 +208,11 @@ def escape_nonvalid_html_tags(text: str) -> str:
     """
 
     def replace_tag(m: re.Match) -> str:
-        raw_tag = m.group(1)  # e.g. "<div>", "</span>", "<BadTag>"
+        raw_tag = m.group(1)
         if is_valid_html_tag(raw_tag):
-            # Keep valid tags as-is
             return raw_tag
         else:
-            # Escape invalid tags so they're displayed literally
+            print('escaping', raw_tag)
             return html.escape(raw_tag)
 
     return tag_pattern.sub(replace_tag, text)
@@ -222,20 +221,40 @@ def escape_nonvalid_html_tags(text: str) -> str:
 # %%
 import json
 
+domains = ["krasota", "travel_creation", "synonims_list", "samopoznanie", "pretrain_hf"]
+for domain in domains:
+    filename = f"./test_data/gemba_4_{domain}.json"
+    texts = json.load(open(filename, "r", encoding="utf8"))
 
-filename = "./test_data/gemba_sft_27.1.json"
+    texts = [escape_nonvalid_html_tags(x) for x in texts]
 
-texts = json.load(open(filename, "r", encoding="utf8"))
+    json.dump(
+        texts,
+        open(filename.replace(".json", "_escaped.json"), "w", encoding="utf8"),
+        ensure_ascii=False,
+        indent=4,
+    )
 
-len(texts)
-# %%
-texts = [escape_nonvalid_html_tags(x) for x in texts]
 
-# %%
-json.dump(
-    texts,
-    open(filename.replace(".json", "_escaped.json"), "w", encoding="utf8"),
-    ensure_ascii=False,
-)
+# # filename = "./test_data/gemba_sft_27.1.json"
+# filename = "./test_data/gemba_4_redactor.json"
+
+# texts = json.load(open(filename, "r", encoding="utf8"))
+
+# print(len(texts))
+
+# texts[0]
+
+# # %%
+# texts = [escape_nonvalid_html_tags(x) for x in texts]
+
+# # %%
+# json.dump(
+#     texts,
+#     open(filename.replace(".json", "_escaped.json"), "w", encoding="utf8"),
+#     ensure_ascii=False,
+# )
+
+# # %%
 
 # %%

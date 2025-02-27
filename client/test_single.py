@@ -202,4 +202,31 @@ json.dump(
 comments
 # %%
 actions
+
+#test brackets
+import gigametr as gm
+
+# import src.gigametr as gm
+
+
+first_model = {
+    "name": "GigaSFT 1",
+    "data": "./test_data/demo_100_test_brackets_escaped.json",
+    "meta": "./test_data/demo_100_meta_test_brackets.json",
+}
+# first_model = {"name": "GigaSFT 1", "data": "./test_data/demo_100.json"}
+
+res = gm.sbs.create(
+    name="Test data demo 2", first=first_model, address="localhost", type="single"
+)
+
+print(f"\n\nhttp://localhost:5173/data/check/{res['id']}")
+# %%
+# redactors
+
+import src.gigametr as gm
+
+
+
+
 # %%
