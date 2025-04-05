@@ -79,6 +79,9 @@ export const SbsService = {
         return ApiService.get("sbs",
             `history/actions/${params.sbsId}`);
     },
+    spellCheck(text) {
+        return axios.post("/api/spell-check", { text });
+    },
     resolveSbsTask(params) {
         let form = new FormData();
 

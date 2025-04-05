@@ -1,9 +1,12 @@
 """Main module"""
 
+import difflib
 import json
 import logging
 import os
+import re
 import uuid
+import requests
 
 import config
 import constants as con
@@ -320,6 +323,132 @@ def patch_db(sbs_guid):
     db_helper.patch_db(sbs_guid)
 
     return ("", 200)
+
+
+@app.route("/api/spell-check", methods=["POST"])
+def spell_check_text():
+    """Spell check API endpoint"""
+    data = request.get_json()
+    text = data.get("text", "")
+    
+    if not text:
+        return {"success": False, "error": "No text provided"}, 400
+    
+    if len(text) <= 1000:
+        res = spell_check(text)
+        if res.get('success'):
+            # Generate HTML diff for single chunk too
+            html_diff = generate_html_diff(res['origin'], res['predictions'])
+            res['html_diff'] = html_diff
+    else:
+        res = spell_check_long_text(text)
+
+    return res
+
+
+def split_text_into_chunks(text, max_chunk_size=900):
+    """
+    Split a long text into chunks, trying to break at sentence boundaries.
+    Uses a slightly smaller chunk size (900) to ensure we stay under the 1000 char limit.
+    """
+    chunks = []
+    current_chunk = ""
+    
+    # Split text into sentences (simple approximation)
+    sentences = text.replace("! ", "! SENTENCE_BREAK")\
+                   .replace("? ", "? SENTENCE_BREAK")\
+                   .replace(". ", ". SENTENCE_BREAK")\
+                   .split("SENTENCE_BREAK")
+    
+    for sentence in sentences:
+        # If adding this sentence would exceed the chunk size
+        if len(current_chunk) + len(sentence) > max_chunk_size and current_chunk:
+            chunks.append(current_chunk.strip())
+            current_chunk = sentence
+        else:
+            current_chunk += sentence
+            
+        # If current chunk is already too large, split it at the max_chunk_size
+        while len(current_chunk) > max_chunk_size:
+            chunks.append(current_chunk[:max_chunk_size].strip())
+            current_chunk = current_chunk[max_chunk_size:]
+    
+    # Add the last chunk if it's not empty
+    if current_chunk.strip():
+        chunks.append(current_chunk.strip())
+    
+    return chunks
+
+
+def generate_html_diff(original_text, corrected_text):
+    """
+    Generate HTML-formatted diff between original and corrected text
+    with appropriate highlighting.
+    """
+    
+    #TODO
+
+    return 
+
+
+def spell_check_long_text(text):
+    """
+    Process a long text by splitting it into chunks and combining the results.
+    """
+    chunks = split_text_into_chunks(text)
+    logging.info(f"Splitting text into {len(chunks)} chunks for spell checking")
+    
+    # Process each chunk
+    original_chunks = []
+    corrected_chunks = []
+    all_comments = []
+    
+    for chunk in chunks:
+        result = spell_check(chunk)
+        
+        if not result.get('success', False):
+            # If any chunk fails, return the error
+            return result
+        
+        original_chunks.append(result.get('origin', chunk))
+        corrected_chunks.append(result.get('predictions', chunk))
+        all_comments.extend(result.get('comment', ['OK']))
+    
+    # Combine results
+    original_text = ''.join(original_chunks)
+    corrected_text = ''.join(corrected_chunks)
+    
+    # Generate HTML diff
+    html_diff = generate_html_diff(original_text, corrected_text)
+    
+    return {
+        'origin': original_text,
+        'predictions': corrected_text,
+        'html_diff': html_diff,
+        'comment': all_comments,
+        'success': True,
+        'version': '1.1.3',
+        'chunks_processed': len(chunks)
+    }
+
+
+def spell_check(text):
+    """
+    returns:
+    {'origin': 'Carrect tixt',
+     'comment': ['OK'],
+     'predictions': 'Correct text',
+     'success': True,
+     'version': '1.1.3'}
+    """
+    headers = {
+        "x-api-key": "924875b53cc94dad9d7ddb047b4a2703",
+        "X-Workspace-Id": "1db1c352-96a2-4e9d-b53c-376fb9957da3",
+        'content-Type': 'application/json'
+    }
+    payload = {"instances": [{"text": text}]}
+    url = "https://mlspace.ai.cloud.ru/deployments/dgx2-inf-001/kfserving-1697487248/v1/models/kfserving-1697487248:predict"
+    return requests.post(url, json=payload, headers=headers).json()
 
 
 # Not API calls treated like static queries
