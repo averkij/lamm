@@ -386,9 +386,28 @@ def generate_html_diff(original_text, corrected_text):
     with appropriate highlighting.
     """
     
-    #TODO
+    matcher = difflib.SequenceMatcher(None, original_text, corrected_text)
+    html_diff = []
+    
+    for opcode, i1, i2, j1, j2 in matcher.get_opcodes():
+        if opcode == 'equal':
+            html_diff.append(original_text[i1:i2])
+        elif opcode == 'delete':
+            deleted_text = original_text[i1:i2]
+            html_diff.append(f'<span class="diff-deleted" style="background-color: #ffe6e6; text-decoration: line-through;">{deleted_text}</span>')
+        elif opcode == 'insert':
+            inserted_text = corrected_text[j1:j2]
+            html_diff.append(f'<span class="diff-added" style="background-color: #e6ffe6;">{inserted_text}</span>')
+        elif opcode == 'replace':
+            deleted_text = original_text[i1:i2]
+            inserted_text = corrected_text[j1:j2]
+            html_diff.append(f'<span class="diff-deleted" style="background-color: #ffe6e6; text-decoration: line-through;">{deleted_text}</span>')
+            html_diff.append(f'<span class="diff-added" style="background-color: #e6ffe6;">{inserted_text}</span>')
 
-    return 
+    res = "".join(html_diff)
+    res = res.replace(con.SPELL_FIX, '\n\n')
+
+    return res
 
 
 def spell_check_long_text(text):
