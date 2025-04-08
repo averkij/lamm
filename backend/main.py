@@ -398,23 +398,25 @@ def spell_check_text():
             res = spell_check(text)
             if res.get('success'):
                 html_diff = generate_html_diff(res['origin'], res['predictions'])
-                res['html_diff'] = html_diff
-
-            meta_1["spell_check_html_diff"] = res['html_diff']
-            meta_1["spell_check_success"] = res['success']
-            meta_1["spell_check_version"] = res['version']
-            message["content_corrected"] = res['predictions']
+                message["spell_check_html_diff"] = html_diff
+                message["spell_check_success"] = res['success']
+                message["spell_check_version"] = res['version']
+                message["content_corrected"] = res['predictions']
         else:
             res = spell_check_long_text(text)
-            meta_1["spell_check_html_diff"] = res['html_diff']
-            meta_1["spell_check_success"] = res['success']
-            meta_1["spell_check_version"] = res['version']
-            meta_1["spell_check_chunks_processed"] = res['chunks_processed']
+            message["spell_check_success"] = res['success']
+            message["spell_check_version"] = res['version']
+            message["spell_check_chunks_processed"] = res['chunks_processed']
             message["content_corrected"] = res['predictions']
+            html_diff = generate_html_diff(res['origin'], res['predictions'])
+            message["spell_check_html_diff"] = html_diff
+        
+    if all(message.get('spell_check_success', False) for message in raw_1):
+        meta_1["spell_check_success"] = True
+    else:
+        meta_1["spell_check_success"] = False
 
     meta_1 = json.dumps(meta_1, ensure_ascii=False, indent=4)
-    print(meta_1)
-
     db_helper.update_task(sbs_guid, task_id, meta_1)
 
     return ("", 200)
