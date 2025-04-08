@@ -168,6 +168,37 @@ def get_task(sbs_guid, user_guid, try_id):
     return {"items": res}
 
 
+@app.route("/sbs/task/reload/<sbs_guid>/<task_id>/<user_guid>", methods=["GET"])
+def reload_task(sbs_guid, task_id, user_guid):
+    """Reload a specific task by ID without incrementing counters"""
+
+    if not helper.db_exists(sbs_guid):
+        return ("SBS not found", 404)
+
+    logging.info(f"Reloading task ID {task_id} for SBS. sbs_guid: {sbs_guid}.")
+
+    db_version = db_helper.get_version(sbs_guid)
+    db_helper.ensure_user_exists(sbs_guid, user_guid)
+    
+    tasks = db_helper.get_task_by_id(sbs_guid, task_id)
+
+    res = [
+        (
+            x[0],
+            x[1],
+            x[2],
+            x[3],
+            x[4],
+            x[5],
+            x[6] if db_version >= 0.4 else '{"meta": -1}',
+            x[7] if db_version >= 0.4 else '{"meta": -1}',
+        )
+        for x in tasks
+    ]
+
+    return {"items": res}
+
+
 @app.route("/sbs/task/resolve", methods=["POST"])
 def resolve_task():
     """Resolve task"""
@@ -343,15 +374,23 @@ def spell_check_text():
     """Calculate spell check for text in raw data (in task meta_1 field)"""
     sbs_guid = request.form.get("sbs_guid", None)
     task_id = request.form.get("task_id", None)
+
+    print(sbs_guid, task_id)
+
     if not helper.db_exists(sbs_guid):
         return ("SBS not found", 404)
     
     task = db_helper.read_task(sbs_guid, task_id)
-    meta_1 = json.loads(task[6])
+    meta_1 = json.loads(task[5])
     raw_1 = meta_1["raw"]
     
     for message in raw_1:
         text = message["content"]
+
+        print("*"*100)
+        print(text)
+        print("*"*100)
+
         if not text:
             continue
         
@@ -364,13 +403,17 @@ def spell_check_text():
             meta_1["spell_check_html_diff"] = res['html_diff']
             meta_1["spell_check_success"] = res['success']
             meta_1["spell_check_version"] = res['version']
-            meta_1["spell_check_chunks_processed"] = res['chunks_processed']
+            message["content_corrected"] = res['predictions']
         else:
             res = spell_check_long_text(text)
             meta_1["spell_check_html_diff"] = res['html_diff']
             meta_1["spell_check_success"] = res['success']
             meta_1["spell_check_version"] = res['version']
             meta_1["spell_check_chunks_processed"] = res['chunks_processed']
+            message["content_corrected"] = res['predictions']
+
+    meta_1 = json.dumps(meta_1, ensure_ascii=False, indent=4)
+    print(meta_1)
 
     db_helper.update_task(sbs_guid, task_id, meta_1)
 
