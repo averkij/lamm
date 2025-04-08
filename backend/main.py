@@ -153,16 +153,18 @@ def get_task(sbs_guid, user_guid, try_id):
 
     res = [
         (
-            x[0],
-            x[1],
-            x[2],
-            x[3],
-            x[4],
-            x[5],
-            x[6] if db_version >= 0.4 else '{"meta": -1}',
-            x[7] if db_version >= 0.4 else '{"meta": -1}',
+            task[0],
+            task[1],
+            task[2],
+            task[3],
+            task[4],
+            task[5],
+            task[6] if db_version >= 0.4 else '{"meta": -1}',
+            task[7] if db_version >= 0.4 else '{"meta": -1}',
+            helper.get_corrected(task, db_version),
+            helper.get_html_diff(task, db_version)
         )
-        for x in tasks
+        for task in tasks
     ]
 
     return {"items": res}
@@ -181,7 +183,7 @@ def reload_task(sbs_guid, task_id, user_guid):
     db_helper.ensure_user_exists(sbs_guid, user_guid)
     
     tasks = db_helper.get_task_by_id(sbs_guid, task_id)
-
+    
     res = [
         (
             x[0],
@@ -192,6 +194,8 @@ def reload_task(sbs_guid, task_id, user_guid):
             x[5],
             x[6] if db_version >= 0.4 else '{"meta": -1}',
             x[7] if db_version >= 0.4 else '{"meta": -1}',
+            helper.get_corrected(x, db_version),
+            helper.get_html_diff(x, db_version)
         )
         for x in tasks
     ]
