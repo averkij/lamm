@@ -74,7 +74,7 @@ for domain in domains:
 import src.gigametr as gm
 import time
 
-for domain in domains[:1]:
+for domain in domains[1:2]:
     first_model = {
         "name": f"{domain}",
         "data": f"./test_data/gemba_4_{domain}_escaped.json",
