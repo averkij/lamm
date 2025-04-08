@@ -115,31 +115,31 @@
             >Не база</v-btn
           >
         </v-col>
-        <v-col cols="12 mt-2" class="text-center"
+        <v-col cols="12 mt-4" class="text-center"
           ><v-btn
-            class="btn-main"
-            color="grey"
-            variant="tonal"
+            class="btn-main btn-white"
+            color="white"
+            variant="flat"
             @click="vote('skip')"
             :disabled="isLoading"
-            >Пропустить</v-btn
+            >⏩ Пропустить</v-btn
           ><v-btn
-            class="ml-8 btn-main"
-            color="grey"
-            variant="tonal"
+            class="ml-8 btn-main btn-white"
+            color="white"
+            variant="flat"
             @click="
               // $refs.commentDialog.init();
               showCommentDialog = true
             "
             :disabled="isLoading"
-            >Пометить</v-btn
+            >🖊️ Пометить</v-btn
           >
           <v-btn
-            class="ml-8 btn-main"
-            color="blue"
-            variant="tonal"
+            class="ml-8 btn-main btn-white"
+            color="white"
+            variant="flat"
             @click="spellCheck"
-            :disabled="isLoading || spellCheckInProgress"
+            :disabled="isLoading || spellCheckInProgress || taskMeta.spell_check_success"
           >
             <v-progress-circular
               v-if="spellCheckInProgress"
@@ -149,7 +149,7 @@
               color="white"
               class="mr-2"
             ></v-progress-circular>
-            {{ showSpellCheck && taskMeta.spell_check_success ? 'Show original' : 'Spell check' }}
+            ✅ Проверить
           </v-btn>
           <CommentDialog
             ref="commentDialog"
@@ -345,16 +345,7 @@ export default defineComponent({
         this.swapAnswers = false;
       }
     },
-    spellCheck() {
-      // If spell check results are already showing, toggle back to original view
-      if (this.showSpellCheck && this.taskMeta.spell_check_success) {
-        this.showSpellCheck = false;
-        this.snackbarText = 'Showing original text';
-        this.snackbarColor = 'info';
-        this.snackbar = true;
-        return;
-      }
-      
+    spellCheck() {      
       this.spellCheckInProgress = true;
       
       SbsService.spellCheck({
@@ -373,12 +364,9 @@ export default defineComponent({
             this.taskMeta = JSON.parse(this.sbsTasks[0][6]);
             this.spellCheckInProgress = false;
             
-            // If spell check was successful, show the results
             if (this.taskMeta.spell_check_success) {
-              this.renderMarkdown = false; // Disable markdown to show HTML diff
-              this.showSpellCheck = true;
-              
-              // Show success snackbar
+              // this.renderMarkdown = false;
+              // this.showSpellCheck = true;
               this.snackbarText = 'Spell check completed successfully';
               this.snackbarColor = 'success';
               this.snackbar = true;
@@ -459,5 +447,9 @@ div {
 
 .markdown-content :deep(p:not(:last-child)) {
   margin-bottom: 0.6em;
+}
+
+.btn-white:disabled {
+  color: #ccc !important;
 }
 </style>
