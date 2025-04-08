@@ -13,7 +13,7 @@
             label="Markdown"
             hide-details
             density="compact"
-            :disabled="showDiff || showCorrected"
+            :disabled="showDiff"
           ></v-switch>
           <v-switch
             v-if="taskMeta.spell_check_success"
@@ -33,7 +33,7 @@
             hide-details
             density="compact"
             class="mt-2"
-            :disabled="renderMarkdown || showDiff"
+            :disabled="showDiff"
           ></v-switch>
         </v-col>
       </v-row>
@@ -428,6 +428,9 @@ export default defineComponent({
     },
     displayText() {
       if (this.showCorrected && this.taskMeta.corrected && this.taskMeta.spell_check_success) {
+        if (this.renderMarkdown) {
+          return this.renderAsMarkdown(this.taskMeta.corrected);
+        }
         return this.taskMeta.corrected;
       }
       if (this.showDiff && this.taskMeta.html_diff && this.taskMeta.spell_check_success) {
@@ -455,14 +458,12 @@ export default defineComponent({
     },
     showCorrected(newVal) {
       if (newVal) {
-        this.renderMarkdown = false;
         this.showDiff = false;
       }
     },
     renderMarkdown(newVal) {
-      if (newVal) {
+      if (newVal && this.showDiff) {
         this.showDiff = false;
-        this.showCorrected = false;
       }
     }
   },
