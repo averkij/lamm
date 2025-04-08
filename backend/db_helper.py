@@ -122,8 +122,48 @@ def read_task(sbs_guid, task_id):
     """Read task from SBS"""
     db_path = helper.get_sbs_path(sbs_guid)
     with sqlite3.connect(db_path) as db:
-        task = db.execute("select * from tasks where id=?", (task_id,)).fetchone()
+        task = db.execute("""select 
+                            t.id,
+                            t.question_1,
+                            t.question_2,
+                            t.answer_1,
+                            t.answer_2,
+                            t.meta_1
+                           from tasks t where id=?""", (task_id,)).fetchone()
         return task
+
+
+def get_task_by_id(sbs_guid, task_id):
+    """Get specific task by ID without updating counters"""
+    db_path = helper.get_sbs_path(sbs_guid)
+    
+    with sqlite3.connect(db_path) as db:
+        db_version = get_version(sbs_guid)
+        
+        if db_version >= 0.4:
+            task = db.execute(
+                """select
+                    t.id, t.question_1, t.question_2, t.answer_1, t.answer_2, t.answer_count, t.meta_1, t.meta_2
+                from
+                    tasks t
+                where
+                    t.id = ?""",
+                (task_id,),
+            ).fetchone()
+        else:
+            task = db.execute(
+                """select
+                    t.id, t.question_1, t.question_2, t.answer_1, t.answer_2, t.answer_count
+                from
+                    tasks t
+                where
+                    t.id = ?""",
+                (task_id,),
+            ).fetchone()
+            
+        if task:
+            return [task]
+        return []
 
 
 def update_task(sbs_guid, task_id, meta_1):
