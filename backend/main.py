@@ -161,7 +161,7 @@ def get_task(sbs_guid, user_guid, try_id):
             task[5],
             task[6] if db_version >= 0.4 else '{"meta": -1}',
             task[7] if db_version >= 0.4 else '{"meta": -1}',
-            helper.get_corrected(task, db_version),
+            helper.get_corrected_from_diff(task, db_version),
             helper.get_html_diff(task, db_version)
         )
         for task in tasks
@@ -186,18 +186,18 @@ def reload_task(sbs_guid, task_id, user_guid):
     
     res = [
         (
-            x[0],
-            x[1],
-            x[2],
-            x[3],
-            x[4],
-            x[5],
-            x[6] if db_version >= 0.4 else '{"meta": -1}',
-            x[7] if db_version >= 0.4 else '{"meta": -1}',
-            helper.get_corrected(x, db_version),
-            helper.get_html_diff(x, db_version)
+            task[0],
+            task[1],
+            task[2],
+            task[3],
+            task[4],
+            task[5],
+            task[6] if db_version >= 0.4 else '{"meta": -1}',
+            task[7] if db_version >= 0.4 else '{"meta": -1}',
+            helper.get_corrected_from_diff(task, db_version),
+            helper.get_html_diff(task, db_version)
         )
-        for x in tasks
+        for task in tasks
     ]
 
     return {"items": res}
@@ -426,7 +426,7 @@ def spell_check_text():
     return ("", 200)
 
 
-def split_text_into_chunks(text, max_chunk_size=900):
+def split_text_into_chunks(text, max_chunk_size=1000):
     """
     Split a long text into chunks, trying to break at sentence boundaries.
     Uses a slightly smaller chunk size (900) to ensure we stay under the 1000 char limit.
@@ -470,18 +470,21 @@ def generate_html_diff(original_text, corrected_text):
             html_diff.append(original_text[i1:i2])
         elif opcode == 'delete':
             deleted_text = original_text[i1:i2]
-            html_diff.append(f'<span class="diff-deleted" style="background-color: #ffe6e6; text-decoration: line-through;">{deleted_text}</span>')
+            html_diff.append(f'<span class="diff-deleted">{deleted_text}</span>')
         elif opcode == 'insert':
             inserted_text = corrected_text[j1:j2]
-            html_diff.append(f'<span class="diff-added" style="background-color: #e6ffe6;">{inserted_text}</span>')
+            html_diff.append(f'<span class="diff-added">{inserted_text}</span>')
         elif opcode == 'replace':
             deleted_text = original_text[i1:i2]
             inserted_text = corrected_text[j1:j2]
-            html_diff.append(f'<span class="diff-deleted" style="background-color: #ffe6e6; text-decoration: line-through;">{deleted_text}</span>')
-            html_diff.append(f'<span class="diff-added" style="background-color: #e6ffe6;">{inserted_text}</span>')
+            html_diff.append(f'<span class="diff-deleted">{deleted_text}</span>')
+            html_diff.append(f'<span class="diff-added">{inserted_text}</span>')
 
     res = "".join(html_diff)
-    res = res.replace(con.SPELL_FIX, '\n\n')
+    # replace with same amount of \n
+    res = res.replace('<span class="diff-deleted">\n</span><span class="diff-added"> </span>', '\n')
+    res = res.replace('<span class="diff-deleted">\n\n</span><span class="diff-added"> </span>', '\n\n')
+    res = res.replace('<span class="diff-deleted">[\n]+</span><span class="diff-added"> </span>', '\n\n')
 
     return res
 
