@@ -45,10 +45,11 @@ def sbs_create():
     model_name_2 = request.form.get("model_1", "model_1")
     filename_1 = request.form["filename_1"]
     extra_data = request.form.get("extra_data", "{}")
+    extra_data = json.loads(extra_data)
 
     filename_meta_1 = request.form.get("filename_meta_1", None)
     filename_meta_2 = request.form.get("filename_meta_2", None)
-
+    filename_raw_1 = request.form.get("filename_raw_1", None)
     if sbs_type == con.SBS_TYPE_DOUBLE:
         model_name_2 = request.form.get("model_2", "model_2")
         filename_2 = request.form["filename_2"]
@@ -72,14 +73,23 @@ def sbs_create():
         ) as file_1:
             items_1 = json.load(file_1) # flat list
 
+    raw_1 = [[] for _ in items_1]
+    if filename_raw_1:
+        with open(
+            os.path.join(upload_folder, filename_raw_1), mode="r", encoding="utf-8"
+        ) as file_raw_1:
+            logging.info(f"Loading raw data from {filename_raw_1}.")
+            raw_1 = json.load(file_raw_1)
+
     if filename_meta_1:
         with open(
             os.path.join(upload_folder, filename_meta_1), mode="r", encoding="utf-8"
         ) as file_meta_1:
             meta_1 = json.load(file_meta_1)
-            meta_1 = [json.dumps(x, ensure_ascii=False) for x in meta_1]
+            meta_1 = [json.dumps(x | {"raw": y}, ensure_ascii=False) for x,y in zip(meta_1, raw_1)]
     else:
         meta_1 = ["{}"] * len(items_1)
+
 
     if sbs_type == con.SBS_TYPE_SINGLE:
         # temp hack
@@ -107,6 +117,8 @@ def sbs_create():
                 items_2 = [[x[0], x[1], y] for x, y in zip(items_2, meta_2)]
 
     helper.check_data(items_1, items_2)
+
+    extra_data = json.dumps(extra_data)
 
     db_helper.create_db(sbs_guid, sbs_name, model_name_1, model_name_2, extra_data)
     db_helper.fill_db(sbs_guid, items_1, items_2)
@@ -328,8 +340,10 @@ def patch_db(sbs_guid):
 @app.route("/api/spell-check", methods=["POST"])
 def spell_check_text():
     """Spell check API endpoint"""
-    data = request.get_json()
-    text = data.get("text", "")
+    # sbs_guid = request.form.get("sbs_guid", None)
+    # user_guid = request.form.get("user_guid", None)
+    # task_id = request.form.get("task_id", None)
+    text = request.form.get("text", "")
     
     if not text:
         return {"success": False, "error": "No text provided"}, 400
@@ -337,11 +351,12 @@ def spell_check_text():
     if len(text) <= 1000:
         res = spell_check(text)
         if res.get('success'):
-            # Generate HTML diff for single chunk too
             html_diff = generate_html_diff(res['origin'], res['predictions'])
             res['html_diff'] = html_diff
     else:
         res = spell_check_long_text(text)
+
+    #todo save to db
 
     return res
 
