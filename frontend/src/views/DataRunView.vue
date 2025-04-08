@@ -1,107 +1,181 @@
 <template>
-  <div v-if="taskText">
-    <v-row class="mt-0 pt-0" v-if="source_file">
-      <v-col cols="10" class="text-left">
-        <span class="text-subtitle-1">Source: </span
-        ><span class="text-h6 ml-2 source-title">{{ source_file }}</span>
-      </v-col>
-      <v-col cols="2" class="text-right">
-        <v-switch
-          v-model="renderMarkdown"
-          color="primary"
-          label="Render markdown"
-          hide-details
-          density="compact"
-        ></v-switch>
-      </v-col>
-    </v-row>
+  <div>
+    <div v-if="taskText">
+      <v-row class="mt-0 pt-0" v-if="source_file">
+        <v-col cols="10" class="text-left">
+          <span class="text-subtitle-1">Source: </span
+          ><span class="text-h6 ml-2 source-title">{{ source_file }}</span>
+        </v-col>
+        <v-col cols="2" class="text-right">
+          <v-switch
+            v-model="renderMarkdown"
+            color="primary"
+            label="Render markdown"
+            hide-details
+            density="compact"
+          ></v-switch>
+        </v-col>
+      </v-row>
 
-    <!-- <div>{{ taskText }}</div> -->
+      <v-row v-if="taskMeta.spell_check_success" class="mt-1">
+        <v-col cols="12">
+          <v-chip
+            color="blue"
+            size="small"
+            class="mr-2"
+          >
+            <v-icon start size="small">mdi-spellcheck</v-icon>
+            Spell check applied
+          </v-chip>
+          <v-chip
+            v-if="taskMeta.spell_check_chunks_processed > 1"
+            color="grey"
+            size="small"
+          >
+            {{ taskMeta.spell_check_chunks_processed }} chunks processed
+          </v-chip>
+        </v-col>
+      </v-row>
 
-    <v-row class="mt-4">
-      <!-- condition class text-h5 -->
-      <v-col
-        cols="12"
-        class="text-h5"
-        :class="{ 'markdown-content': renderMarkdown, 'pre-wrap': !renderMarkdown }"
-        ><div v-html="displayText"></div
-      ></v-col>
-    </v-row>
+      <v-row v-if="showSpellCheck && taskMeta.spell_check_success" class="mt-1">
+        <v-col cols="12">
+          <v-chip
+            color="blue"
+            size="small"
+            class="mr-2"
+          >
+            <v-icon start size="small">mdi-spellcheck</v-icon>
+            Spell check applied
+          </v-chip>
+          <v-chip
+            v-if="taskMeta.spell_check_chunks_processed > 1"
+            color="grey"
+            size="small"
+          >
+            {{ taskMeta.spell_check_chunks_processed }} chunks processed
+          </v-chip>
+        </v-col>
+      </v-row>
 
-    <!-- <v-row class="mt-8">
-      <v-col cols="12" sm="6"
-        ><v-card elevation="1" class="pa-5 bg-yellow-lighten-5 pre-wrap">
-          {{ taskLeft }}
-        </v-card></v-col
-      >
-      <v-col cols="12" sm="6"
-        ><v-card elevation="1" class="pa-5 bg-yellow-lighten-5 pre-wrap">
-          {{ taskRight }}
-        </v-card></v-col
-      >
-    </v-row> -->
-    <v-row class="mt-12">
-      <v-col cols="12 mt-8 hidden-sm-and-down" class="text-center">
+      <!-- <div>{{ taskText }}</div> -->
+
+      <v-row class="mt-4">
+        <!-- condition class text-h5 -->
+        <v-col
+          cols="12"
+          class="text-h5"
+          :class="{ 'markdown-content': renderMarkdown, 'pre-wrap': !renderMarkdown }"
+          ><div v-html="displayText"></div
+        ></v-col>
+      </v-row>
+
+      <!-- <v-row class="mt-8">
+        <v-col cols="12" sm="6"
+          ><v-card elevation="1" class="pa-5 bg-yellow-lighten-5 pre-wrap">
+            {{ taskLeft }}
+          </v-card></v-col
+        >
+        <v-col cols="12" sm="6"
+          ><v-card elevation="1" class="pa-5 bg-yellow-lighten-5 pre-wrap">
+            {{ taskRight }}
+          </v-card></v-col
+        >
+      </v-row> -->
+      <v-row class="mt-12">
+        <v-col cols="12 mt-8 hidden-sm-and-down" class="text-center">
+          <v-btn
+            class="btn-main"
+            color="green"
+            variant="tonal"
+            @click="vote('good')"
+            :disabled="isLoading"
+            >База</v-btn
+          ><v-btn
+            class="ml-8 btn-main"
+            color="red"
+            variant="tonal"
+            @click="vote('bad')"
+            :disabled="isLoading"
+            >Не база</v-btn
+          ></v-col
+        ><v-col cols="12 mt-2 hidden-md-and-up" class="text-center"
+          ><v-btn
+            color="green"
+            class="btn-main"
+            variant="tonal"
+            @click="vote('good')"
+            :disabled="isLoading"
+            >База</v-btn
+          ><v-btn
+            class="ml-8 btn-main"
+            color="red"
+            variant="tonal"
+            @click="vote('bad')"
+            :disabled="isLoading"
+            >Не база</v-btn
+          >
+        </v-col>
+        <v-col cols="12 mt-2" class="text-center"
+          ><v-btn
+            class="btn-main"
+            color="grey"
+            variant="tonal"
+            @click="vote('skip')"
+            :disabled="isLoading"
+            >Пропустить</v-btn
+          ><v-btn
+            class="ml-8 btn-main"
+            color="grey"
+            variant="tonal"
+            @click="
+              // $refs.commentDialog.init();
+              showCommentDialog = true
+            "
+            :disabled="isLoading"
+            >Пометить</v-btn
+          >
+          <v-btn
+            class="ml-8 btn-main"
+            color="blue"
+            variant="tonal"
+            @click="spellCheck"
+            :disabled="isLoading || spellCheckInProgress"
+          >
+            <v-progress-circular
+              v-if="spellCheckInProgress"
+              indeterminate
+              size="20"
+              width="2"
+              color="white"
+              class="mr-2"
+            ></v-progress-circular>
+            {{ showSpellCheck && taskMeta.spell_check_success ? 'Show original' : 'Spell check' }}
+          </v-btn>
+          <CommentDialog
+            ref="commentDialog"
+            v-model="showCommentDialog"
+            :inProgress="commentInProgress"
+            @comment="sendComment"
+            @close="showCommentDialog = false"
+          />
+        </v-col>
+      </v-row>
+    </div>
+    <v-snackbar
+      v-model="snackbar"
+      :color="snackbarColor"
+      timeout="3000"
+    >
+      {{ snackbarText }}
+      <template v-slot:actions>
         <v-btn
-          class="btn-main"
-          color="green"
-          variant="tonal"
-          @click="vote('good')"
-          :disabled="isLoading"
-          >База</v-btn
-        ><v-btn
-          class="ml-8 btn-main"
-          color="red"
-          variant="tonal"
-          @click="vote('bad')"
-          :disabled="isLoading"
-          >Не база</v-btn
-        ></v-col
-      ><v-col cols="12 mt-2 hidden-md-and-up" class="text-center"
-        ><v-btn
-          color="green"
-          class="btn-main"
-          variant="tonal"
-          @click="vote('good')"
-          :disabled="isLoading"
-          >База</v-btn
-        ><v-btn
-          class="ml-8 btn-main"
-          color="red"
-          variant="tonal"
-          @click="vote('bad')"
-          :disabled="isLoading"
-          >Не база</v-btn
+          variant="text"
+          @click="snackbar = false"
         >
-      </v-col>
-      <v-col cols="12 mt-2" class="text-center"
-        ><v-btn
-          class="btn-main"
-          color="grey"
-          variant="tonal"
-          @click="vote('skip')"
-          :disabled="isLoading"
-          >Пропустить</v-btn
-        ><v-btn
-          class="ml-8 btn-main"
-          color="grey"
-          variant="tonal"
-          @click="
-            // $refs.commentDialog.init();
-            showCommentDialog = true
-          "
-          :disabled="isLoading"
-          >Пометить</v-btn
-        >
-        <CommentDialog
-          ref="commentDialog"
-          v-model="showCommentDialog"
-          :inProgress="commentInProgress"
-          @comment="sendComment"
-          @close="showCommentDialog = false"
-        />
-      </v-col>
-    </v-row>
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
   </div>
 </template>
 
@@ -110,9 +184,10 @@ import { defineComponent } from "vue";
 
 // Components
 import { mapGetters } from "vuex";
-import { GET_SBS_INFO, GET_TASK, RESOLVE_TASK } from "@/store/actions.type";
+import { GET_SBS_INFO, GET_TASK, RELOAD_TASK, RESOLVE_TASK } from "@/store/actions.type";
 import CommentDialog from "@/components/CommentDialog.vue";
 import { marked } from "marked";
+import { SbsService } from "@/common/api.service";
 
 export default defineComponent({
   name: "DataRunView",
@@ -128,6 +203,11 @@ export default defineComponent({
       showCommentDialog: false,
       commentInProgress: false,
       renderMarkdown: false,
+      spellCheckInProgress: false,
+      showSpellCheck: false,
+      snackbar: false,
+      snackbarText: '',
+      snackbarColor: '',
     };
   },
   methods: {
@@ -265,6 +345,58 @@ export default defineComponent({
         this.swapAnswers = false;
       }
     },
+    spellCheck() {
+      // If spell check results are already showing, toggle back to original view
+      if (this.showSpellCheck && this.taskMeta.spell_check_success) {
+        this.showSpellCheck = false;
+        this.snackbarText = 'Showing original text';
+        this.snackbarColor = 'info';
+        this.snackbar = true;
+        return;
+      }
+      
+      this.spellCheckInProgress = true;
+      
+      SbsService.spellCheck({
+        sbsId: this.$route.params.hash,
+        taskId: this.taskId
+      })
+      .then(() => {
+        this.$store
+          .dispatch(RELOAD_TASK, {
+            sbsId: this.$route.params.hash,
+            taskId: this.taskId,
+            userId: this.userId,
+          })
+          .then(() => {
+            this.taskText = this.formatTaskText(this.sbsTasks[0][1]);
+            this.taskMeta = JSON.parse(this.sbsTasks[0][6]);
+            this.spellCheckInProgress = false;
+            
+            // If spell check was successful, show the results
+            if (this.taskMeta.spell_check_success) {
+              this.renderMarkdown = false; // Disable markdown to show HTML diff
+              this.showSpellCheck = true;
+              
+              // Show success snackbar
+              this.snackbarText = 'Spell check completed successfully';
+              this.snackbarColor = 'success';
+              this.snackbar = true;
+            } else {
+              this.snackbarText = 'Spell check failed';
+              this.snackbarColor = 'error';
+              this.snackbar = true;
+            }
+          });
+      })
+      .catch(error => {
+        console.error('Error during spell check:', error);
+        this.spellCheckInProgress = false;
+        this.snackbarText = 'Error performing spell check';
+        this.snackbarColor = 'error';
+        this.snackbar = true;
+      });
+    },
   },
   computed: {
     ...mapGetters(["userId", "userName", "sbsInfo", "sbsTasks", "tryId"]),
@@ -281,6 +413,9 @@ export default defineComponent({
     displayText() {
       if (this.renderMarkdown) {
         return this.renderAsMarkdown(this.taskText);
+      }
+      if (this.showSpellCheck && this.taskMeta.spell_check_html_diff && this.taskMeta.spell_check_success) {
+        return this.taskMeta.spell_check_html_diff;
       }
       return this.taskText;
     },

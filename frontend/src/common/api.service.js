@@ -71,6 +71,10 @@ export const SbsService = {
         return ApiService.get("sbs",
             `task/get/${params.sbsId}/${params.userId}/${params.tryId}`);
     },
+    reloadSbsTask(params) {
+        return ApiService.get("sbs",
+            `task/reload/${params.sbsId}/${params.taskId}/${params.userId}`);
+    },
     getSbsComments(params) {
         return ApiService.get("sbs",
             `history/comments/${params.sbsId}`);
@@ -79,8 +83,13 @@ export const SbsService = {
         return ApiService.get("sbs",
             `history/actions/${params.sbsId}`);
     },
-    spellCheck(text) {
-        return axios.post("/api/spell-check", { text });
+    spellCheck(params) {
+        let form = new FormData();
+        form.append("sbs_guid", params.sbsId);
+        form.append("task_id", params.taskId);
+        
+        return ApiService.post("api",
+            `spell-check`, form);
     },
     resolveSbsTask(params) {
         let form = new FormData();

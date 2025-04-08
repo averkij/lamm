@@ -25,6 +25,7 @@ import {
     GET_SBS_INFO,
     GET_SBS_STAT,
     GET_TASK,
+    RELOAD_TASK,
     GET_SBS_COMMENTS,
     GET_SBS_ACTIONS,
     RESOLVE_TASK,
@@ -89,6 +90,19 @@ export default createStore({
             });
             context.commit(SET_TRY_ID, {
                 tryId: tryId
+            });
+            return data;
+        },
+        async [RELOAD_TASK](context, params) {
+            const {
+                data
+            } = await SbsService.reloadSbsTask({
+                "sbsId": params.sbsId,
+                "taskId": params.taskId,
+                "userId": params.userId
+            });
+            context.commit(SET_TASK, {
+                data: data
             });
             return data;
         },
