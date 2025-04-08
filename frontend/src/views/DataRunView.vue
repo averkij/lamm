@@ -2,43 +2,44 @@
   <div>
     <div v-if="taskText">
       <v-row class="mt-0 pt-0" v-if="source_file">
-        <v-col cols="10" class="text-left">
+        <v-col cols="12" class="text-left">
           <span class="text-subtitle-1">Источник: </span
           ><span class="text-h6 ml-2 source-title">{{ source_file }}</span>
         </v-col>
-        <v-col cols="2" class="text-right">
-          <v-switch
-            v-model="renderMarkdown"
-            color="primary"
-            label="Markdown"
-            hide-details
-            density="compact"
-            :disabled="showDiff"
-          ></v-switch>
-          <v-switch
-            v-if="taskMeta.spell_check_success"
-            v-model="showDiff"
-            color="primary"
-            label="Показать разницу"
-            hide-details
-            density="compact"
-            class="mt-2"
-            :disabled="renderMarkdown || showCorrected"
-          ></v-switch>
-          <v-switch
-            v-if="taskMeta.spell_check_success"
-            v-model="showCorrected"
-            color="primary"
-            label="Исправленный текст"
-            hide-details
-            density="compact"
-            class="mt-2"
-            :disabled="showDiff"
-          ></v-switch>
-        </v-col>
       </v-row>
 
-      <v-row v-if="taskMeta.spell_check_success" class="mt-1">
+      <div class="switch-controls">
+        <v-switch
+          v-model="renderMarkdown"
+          color="primary"
+          label="Markdown"
+          hide-details
+          density="compact"
+          :disabled="showDiff"
+        ></v-switch>
+        <v-switch
+          v-if="taskMeta.spell_check_success"
+          v-model="showDiff"
+          color="primary"
+          label="Показать разницу"
+          hide-details
+          density="compact"
+          class="mt-2"
+          :disabled="renderMarkdown || showCorrected"
+        ></v-switch>
+        <v-switch
+          v-if="taskMeta.spell_check_success"
+          v-model="showCorrected"
+          color="primary"
+          label="Исправленный текст"
+          hide-details
+          density="compact"
+          class="mt-2"
+          :disabled="showDiff"
+        ></v-switch>
+      </div>
+
+      <v-row v-if="taskMeta.spell_check_success" class="mt-4 mb-2">
         <v-col cols="12">
           <v-chip
             color="blue"
@@ -46,7 +47,7 @@
             class="mr-2"
           >
             <v-icon start size="small">mdi-spellcheck</v-icon>
-            Проверка пройдена
+            Spell check passed
           </v-chip>
           <v-chip
             v-if="taskMeta.spell_check_chunks_processed > 1"
@@ -66,7 +67,7 @@
             class="mr-2"
           >
             <v-icon start size="small">mdi-spellcheck</v-icon>
-            Проверка пройдена
+            Spell check passed
           </v-chip>
           <v-chip
             v-if="taskMeta.spell_check_chunks_processed > 1"
@@ -506,5 +507,16 @@ div {
 
 .btn-white:disabled {
   color: #ccc !important;
+}
+
+.switch-controls {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 100;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 </style>
