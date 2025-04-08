@@ -48,12 +48,19 @@ def create(
 
     meta_1_provided = False
     meta_2_provided = False
+    raw_1_provided = False
 
     if "meta" in first and os.path.isfile(first["meta"]):
         meta_1_provided = True
         with open(first["meta"], "r", encoding="utf-8") as file1_meta:
             meta1 = json.load(file1_meta)
             rb_meta1 = json.dumps(meta1).encode("utf-8")
+
+    if "raw" in first and os.path.isfile(first["raw"]):
+        raw_1_provided = True
+        with open(first["raw"], "r", encoding="utf-8") as file1_raw:
+            raw1 = json.load(file1_raw)
+            rb_raw1 = json.dumps(raw1).encode("utf-8")
 
     extra_data = {}
 
@@ -95,6 +102,9 @@ def create(
             if meta_1_provided:
                 data["filename_meta_1"] = os.path.basename(first["meta"])
                 files[data["filename_meta_1"]] = rb_meta1
+            if raw_1_provided:
+                data["filename_raw_1"] = os.path.basename(first["raw"])
+                files[data["filename_raw_1"]] = rb_raw1
             response = requests.post(
                 f"http://{address}/sbs/create",
                 data=data,
