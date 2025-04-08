@@ -15,7 +15,7 @@ COPY ./release/config.js ./src/common
 RUN npm run build
 
 #-------------------------- prod stage ----------------------
-FROM tiangolo/uwsgi-nginx-flask:python3.8 as production-stage
+FROM tiangolo/uwsgi-nginx-flask:python3.9 as production-stage
 
 #serve static/index.html
 ENV STATIC_INDEX 1
