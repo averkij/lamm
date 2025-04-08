@@ -113,7 +113,17 @@ def get_html_diff(task, db_version):
     """Get html diff"""
     if db_version >= 0.5:
         meta = json.loads(task[6])
-        return format_message(meta["raw"], "spell_check_html_diff")
+        html_diff = format_message(meta["raw"], "spell_check_html_diff")
+
+        # dirty hacks
+        
+        html_diff = html_diff.replace('<span class="diff-deleted">\n</span><span class="diff-added"> </span>', '\n')
+        html_diff = html_diff.replace('<span class="diff-deleted">\n\n</span><span class="diff-added"> </span>', '\n\n')
+        html_diff = html_diff.replace('<span class="diff-deleted">:\n\n</span><span class="diff-added">. </span>', '.\n')
+
+        html_diff = re.sub(r'<span class="diff-deleted">(\n+)</span>', r'\1', html_diff, flags=re.DOTALL)
+
+        return html_diff
     else:
         return None
     
@@ -121,17 +131,18 @@ def get_html_diff(task, db_version):
 def get_corrected_from_diff(task, db_version):
     """Get corrected from diff"""
     if db_version >= 0.5:
-        meta = json.loads(task[6])
-        diff_message = format_message(meta["raw"], "spell_check_html_diff")
+        html_diff = get_html_diff(task, db_version)
+        if not html_diff:
+            return None
 
-        print('***', diff_message)
+        print('***', html_diff)
 
         # delete <span class="diff-deleted"> and inside text, consider linebreaks
-        diff_message = re.sub(r'<span class="diff-deleted">(.*?)</span>', '', diff_message, flags=re.DOTALL)
+        html_diff = re.sub(r'<span class="diff-deleted">(.*?)</span>', '', html_diff, flags=re.DOTALL)
 
         #delete <span class="diff-added"> and leave inside text, consider linebreaks
-        diff_message = re.sub(r'<span class="diff-added">(.*?)</span>', r'\1', diff_message, flags=re.DOTALL)
-        return diff_message
+        html_diff = re.sub(r'<span class="diff-added">(.*?)</span>', r'\1', html_diff, flags=re.DOTALL)
+        return html_diff
     else:
         return None
     

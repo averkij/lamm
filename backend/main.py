@@ -481,10 +481,6 @@ def generate_html_diff(original_text, corrected_text):
             html_diff.append(f'<span class="diff-added">{inserted_text}</span>')
 
     res = "".join(html_diff)
-    # replace with same amount of \n
-    res = res.replace('<span class="diff-deleted">\n</span><span class="diff-added"> </span>', '\n')
-    res = res.replace('<span class="diff-deleted">\n\n</span><span class="diff-added"> </span>', '\n\n')
-    res = res.replace('<span class="diff-deleted">[\n]+</span><span class="diff-added"> </span>', '\n\n')
 
     return res
 
