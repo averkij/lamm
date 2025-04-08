@@ -82,6 +82,21 @@ def parse_json_array(json_str):
         return []
 
 
+def format_message(message, field_name="content"):
+    """Format message"""
+    acc = []
+    for m in message:
+        if m[field_name] is None or m[field_name] == "" or m[field_name] == "nan" or (isinstance(m[field_name], float) and m[field_name] != m[field_name]):
+            continue
+        if "trainable" in m:
+            traniable_sign = " 🟢" if m["trainable"] else " 🔵"
+        else:
+            traniable_sign = ""
+        acc.append(f"—{traniable_sign} [{m['role']}] {m[field_name]}")
+    text = "\n\n".join(acc)
+    return text
+
+
 def configure_logging(level=logging.INFO):
     """ "Configure logging module"""
     os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
