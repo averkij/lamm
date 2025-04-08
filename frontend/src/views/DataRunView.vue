@@ -13,6 +13,26 @@
             label="Render markdown"
             hide-details
             density="compact"
+            :disabled="showDiff || showCorrected"
+          ></v-switch>
+          <v-switch
+            v-if="taskMeta.spell_check_success"
+            v-model="showDiff"
+            color="primary"
+            label="Show diff"
+            hide-details
+            density="compact"
+            class="mt-2"
+            :disabled="showCorrected"
+          ></v-switch>
+          <v-switch
+            v-if="taskMeta.spell_check_success"
+            v-model="showCorrected"
+            color="primary"
+            label="Show corrected"
+            hide-details
+            density="compact"
+            class="mt-2"
           ></v-switch>
         </v-col>
       </v-row>
@@ -57,7 +77,8 @@
         </v-col>
       </v-row>
 
-      <!-- <div>{{ taskText }}</div> -->
+      <!-- <div>{{ this.taskMeta.corrected }}</div> -->
+      <!-- <div>{{ this.taskMeta.html_diff }}</div> -->
 
       <v-row class="mt-4">
         <!-- condition class text-h5 -->
@@ -139,8 +160,9 @@
             color="white"
             variant="flat"
             @click="spellCheck"
-            :disabled="isLoading || spellCheckInProgress || taskMeta.spell_check_success"
           >
+          
+          <!-- :disabled="isLoading || spellCheckInProgress || taskMeta.spell_check_success" -->
             <v-progress-circular
               v-if="spellCheckInProgress"
               indeterminate
@@ -205,6 +227,8 @@ export default defineComponent({
       renderMarkdown: false,
       spellCheckInProgress: false,
       showSpellCheck: false,
+      showDiff: false,
+      showCorrected: false,
       snackbar: false,
       snackbarText: '',
       snackbarColor: '',
@@ -243,6 +267,8 @@ export default defineComponent({
           this.taskId = this.sbsTasks[0][0];
           this.taskText = this.formatTaskText(this.sbsTasks[0][1]);
           this.taskMeta = JSON.parse(this.sbsTasks[0][6]);
+          this.taskMeta.corrected = this.sbsTasks[0][8];
+          this.taskMeta.html_diff = this.sbsTasks[0][9];
           console.log("Task:", this.taskMeta);
 
           if (this.swapAnswers) {
@@ -362,6 +388,8 @@ export default defineComponent({
           .then(() => {
             this.taskText = this.formatTaskText(this.sbsTasks[0][1]);
             this.taskMeta = JSON.parse(this.sbsTasks[0][6]);
+            this.taskMeta.corrected = this.sbsTasks[0][8];
+            this.taskMeta.html_diff = this.sbsTasks[0][9];
             this.spellCheckInProgress = false;
             
             if (this.taskMeta.spell_check_success) {
@@ -399,6 +427,12 @@ export default defineComponent({
       return this.taskMeta.source_file;
     },
     displayText() {
+      if (this.showCorrected && this.taskMeta.corrected && this.taskMeta.spell_check_success) {
+        return this.taskMeta.corrected;
+      }
+      if (this.showDiff && this.taskMeta.html_diff && this.taskMeta.spell_check_success) {
+        return this.taskMeta.html_diff;
+      }
       if (this.renderMarkdown) {
         return this.renderAsMarkdown(this.taskText);
       }
@@ -411,6 +445,20 @@ export default defineComponent({
   mounted() {
     this.getSbsInfo();
     this.getNextTask();
+  },
+  watch: {
+    showDiff(newVal) {
+      if (newVal) {
+        this.renderMarkdown = false;
+        this.showCorrected = false;
+      }
+    },
+    showCorrected(newVal) {
+      if (newVal) {
+        this.renderMarkdown = false;
+        this.showDiff = false;
+      }
+    }
   },
   components: { CommentDialog },
 });
