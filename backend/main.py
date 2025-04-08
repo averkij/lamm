@@ -7,6 +7,7 @@ import os
 import re
 import uuid
 import requests
+from tqdm import tqdm
 
 import config
 import constants as con
@@ -339,26 +340,41 @@ def patch_db(sbs_guid):
 
 @app.route("/api/spell-check", methods=["POST"])
 def spell_check_text():
-    """Spell check API endpoint"""
-    # sbs_guid = request.form.get("sbs_guid", None)
-    # user_guid = request.form.get("user_guid", None)
-    # task_id = request.form.get("task_id", None)
-    text = request.form.get("text", "")
+    """Calculate spell check for text in raw data (in task meta_1 field)"""
+    sbs_guid = request.form.get("sbs_guid", None)
+    task_id = request.form.get("task_id", None)
+    if not helper.db_exists(sbs_guid):
+        return ("SBS not found", 404)
     
-    if not text:
-        return {"success": False, "error": "No text provided"}, 400
+    task = db_helper.read_task(sbs_guid, task_id)
+    meta_1 = json.loads(task[6])
+    raw_1 = meta_1["raw"]
     
-    if len(text) <= 1000:
-        res = spell_check(text)
-        if res.get('success'):
-            html_diff = generate_html_diff(res['origin'], res['predictions'])
-            res['html_diff'] = html_diff
-    else:
-        res = spell_check_long_text(text)
+    for message in raw_1:
+        text = message["content"]
+        if not text:
+            continue
+        
+        if len(text) <= 1000:
+            res = spell_check(text)
+            if res.get('success'):
+                html_diff = generate_html_diff(res['origin'], res['predictions'])
+                res['html_diff'] = html_diff
 
-    #todo save to db
+            meta_1["spell_check_html_diff"] = res['html_diff']
+            meta_1["spell_check_success"] = res['success']
+            meta_1["spell_check_version"] = res['version']
+            meta_1["spell_check_chunks_processed"] = res['chunks_processed']
+        else:
+            res = spell_check_long_text(text)
+            meta_1["spell_check_html_diff"] = res['html_diff']
+            meta_1["spell_check_success"] = res['success']
+            meta_1["spell_check_version"] = res['version']
+            meta_1["spell_check_chunks_processed"] = res['chunks_processed']
 
-    return res
+    db_helper.update_task(sbs_guid, task_id, meta_1)
+
+    return ("", 200)
 
 
 def split_text_into_chunks(text, max_chunk_size=900):
@@ -369,26 +385,22 @@ def split_text_into_chunks(text, max_chunk_size=900):
     chunks = []
     current_chunk = ""
     
-    # Split text into sentences (simple approximation)
     sentences = text.replace("! ", "! SENTENCE_BREAK")\
                    .replace("? ", "? SENTENCE_BREAK")\
                    .replace(". ", ". SENTENCE_BREAK")\
                    .split("SENTENCE_BREAK")
     
     for sentence in sentences:
-        # If adding this sentence would exceed the chunk size
         if len(current_chunk) + len(sentence) > max_chunk_size and current_chunk:
             chunks.append(current_chunk.strip())
             current_chunk = sentence
         else:
             current_chunk += sentence
             
-        # If current chunk is already too large, split it at the max_chunk_size
         while len(current_chunk) > max_chunk_size:
             chunks.append(current_chunk[:max_chunk_size].strip())
             current_chunk = current_chunk[max_chunk_size:]
     
-    # Add the last chunk if it's not empty
     if current_chunk.strip():
         chunks.append(current_chunk.strip())
     
@@ -432,27 +444,23 @@ def spell_check_long_text(text):
     chunks = split_text_into_chunks(text)
     logging.info(f"Splitting text into {len(chunks)} chunks for spell checking")
     
-    # Process each chunk
     original_chunks = []
     corrected_chunks = []
     all_comments = []
     
-    for chunk in chunks:
+    for chunk in tqdm(chunks):
         result = spell_check(chunk)
         
         if not result.get('success', False):
-            # If any chunk fails, return the error
             return result
         
         original_chunks.append(result.get('origin', chunk))
         corrected_chunks.append(result.get('predictions', chunk))
         all_comments.extend(result.get('comment', ['OK']))
     
-    # Combine results
     original_text = ''.join(original_chunks)
     corrected_text = ''.join(corrected_chunks)
     
-    # Generate HTML diff
     html_diff = generate_html_diff(original_text, corrected_text)
     
     return {

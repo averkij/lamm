@@ -118,6 +118,21 @@ def update_sbs_state(sbs_guid, state):
         db.execute("update info set state=?", (state,))
 
 
+def read_task(sbs_guid, task_id):
+    """Read task from SBS"""
+    db_path = helper.get_sbs_path(sbs_guid)
+    with sqlite3.connect(db_path) as db:
+        task = db.execute("select * from tasks where id=?", (task_id,)).fetchone()
+        return task
+
+
+def update_task(sbs_guid, task_id, meta_1):
+    """Update task meta_1"""
+    db_path = helper.get_sbs_path(sbs_guid)
+    with sqlite3.connect(db_path) as db:
+        db.execute("update tasks set meta_1=? where id=?", (meta_1, task_id))
+
+
 def get_tasks(sbs_guid, user_guid, try_id, n=1):
     """Get tasks for SBS"""
     db_path = helper.get_sbs_path(sbs_guid)
