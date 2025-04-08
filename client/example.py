@@ -19,19 +19,25 @@ for domain in domains:
         docs = json.load(fin)
         texts = []
         meta = []
+        raw_messages = []
 
         for d in docs:
             # d looks like [{'role': 'system', 'message_index': 0, 'trainable': False, 'content': nan} #nan is not string
-            acc = []
+            acc, acc_raw = [], []
             for m in d:
                 # Skip entries with missing, empty, or NaN content
                 if m["content"] is None or m["content"] == "" or m["content"] == "nan" or (isinstance(m["content"], float) and m["content"] != m["content"]):
                     continue
                 if "trainable" in m:
                     traniable_sign = " 🟢" if m["trainable"] else " 🔵"
+                    is_trainable = True if m["trainable"] else False
                 else:
                     traniable_sign = ""
+                    is_trainable = False
                 acc.append(f"—{traniable_sign} [{m['role']}] {m['content']}")
+                acc_raw.append({"role": m["role"], "content": m["content"], "trainable": is_trainable})
+
+            raw_messages.append(acc_raw)
             text = "\n\n".join(acc)
             texts.append(text)
 
@@ -51,6 +57,13 @@ for domain in domains:
         indent=4,
     )
 
+    json.dump(
+        raw_messages,
+        open(f"./test_data/gemba_4_{domain}_raw.json", "w", encoding="utf8"),
+        ensure_ascii=False,
+        indent=4,
+    )
+
 
 #%%
 # 2. do escape html tags
@@ -66,6 +79,7 @@ for domain in domains[:1]:
         "name": f"{domain}",
         "data": f"./test_data/gemba_4_{domain}_escaped.json",
         "meta": f"./test_data/gemba_4_{domain}_meta.json",
+        "raw": f"./test_data/gemba_4_{domain}_raw.json",
     }
 
     res = gm.sbs.create(
