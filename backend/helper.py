@@ -6,6 +6,7 @@ from warnings import simplefilter
 import constants as con
 import sys
 import datetime
+import re
 
 
 def format_event(event_id):
@@ -113,6 +114,24 @@ def get_html_diff(task, db_version):
     if db_version >= 0.5:
         meta = json.loads(task[6])
         return format_message(meta["raw"], "spell_check_html_diff")
+    else:
+        return None
+    
+
+def get_corrected_from_diff(task, db_version):
+    """Get corrected from diff"""
+    if db_version >= 0.5:
+        meta = json.loads(task[6])
+        diff_message = format_message(meta["raw"], "spell_check_html_diff")
+
+        print('***', diff_message)
+
+        # delete <span class="diff-deleted"> and inside text, consider linebreaks
+        diff_message = re.sub(r'<span class="diff-deleted">(.*?)</span>', '', diff_message, flags=re.DOTALL)
+
+        #delete <span class="diff-added"> and leave inside text, consider linebreaks
+        diff_message = re.sub(r'<span class="diff-added">(.*?)</span>', r'\1', diff_message, flags=re.DOTALL)
+        return diff_message
     else:
         return None
     

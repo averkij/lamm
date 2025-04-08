@@ -20,5 +20,3 @@ ACTION_EVENTS = [
 ]
 
 COMMENT_EVENTS = [EVENT_COMMENT_BAD_PROMPT, EVENT_COMMENT_OTHER]
-
-SPELL_FIX = '<span class="diff-deleted" style="background-color: #ffe6e6; text-decoration: line-through;">\n\n</span><span class="diff-added" style="background-color: #e6ffe6;"> </span>'
