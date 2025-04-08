@@ -82,10 +82,12 @@ def parse_json_array(json_str):
         return []
 
 
-def format_message(message, field_name="content"):
+def format_message(messages, field_name="content"):
     """Format message"""
     acc = []
-    for m in message:
+    for m in messages:
+        if field_name not in m:
+            continue
         if m[field_name] is None or m[field_name] == "" or m[field_name] == "nan" or (isinstance(m[field_name], float) and m[field_name] != m[field_name]):
             continue
         if "trainable" in m:
@@ -96,6 +98,24 @@ def format_message(message, field_name="content"):
     text = "\n\n".join(acc)
     return text
 
+
+def get_corrected(task, db_version):
+    """Get corrected messages"""
+    if db_version >= 0.5:
+        meta = json.loads(task[6])
+        return format_message(meta["raw"], "content_corrected")
+    else:
+        return None
+
+
+def get_html_diff(task, db_version):
+    """Get html diff"""
+    if db_version >= 0.5:
+        meta = json.loads(task[6])
+        return format_message(meta["raw"], "spell_check_html_diff")
+    else:
+        return None
+    
 
 def configure_logging(level=logging.INFO):
     """ "Configure logging module"""
