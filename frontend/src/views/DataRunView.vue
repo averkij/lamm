@@ -3,14 +3,14 @@
     <div v-if="taskText">
       <v-row class="mt-0 pt-0" v-if="source_file">
         <v-col cols="10" class="text-left">
-          <span class="text-subtitle-1">Source: </span
+          <span class="text-subtitle-1">Источник: </span
           ><span class="text-h6 ml-2 source-title">{{ source_file }}</span>
         </v-col>
         <v-col cols="2" class="text-right">
           <v-switch
             v-model="renderMarkdown"
             color="primary"
-            label="Render markdown"
+            label="Markdown"
             hide-details
             density="compact"
             :disabled="showDiff || showCorrected"
@@ -19,20 +19,21 @@
             v-if="taskMeta.spell_check_success"
             v-model="showDiff"
             color="primary"
-            label="Show diff"
+            label="Показать разницу"
             hide-details
             density="compact"
             class="mt-2"
-            :disabled="showCorrected"
+            :disabled="renderMarkdown || showCorrected"
           ></v-switch>
           <v-switch
             v-if="taskMeta.spell_check_success"
             v-model="showCorrected"
             color="primary"
-            label="Show corrected"
+            label="Исправленный текст"
             hide-details
             density="compact"
             class="mt-2"
+            :disabled="renderMarkdown || showDiff"
           ></v-switch>
         </v-col>
       </v-row>
@@ -45,7 +46,7 @@
             class="mr-2"
           >
             <v-icon start size="small">mdi-spellcheck</v-icon>
-            Spell check applied
+            Проверка пройдена
           </v-chip>
           <v-chip
             v-if="taskMeta.spell_check_chunks_processed > 1"
@@ -65,7 +66,7 @@
             class="mr-2"
           >
             <v-icon start size="small">mdi-spellcheck</v-icon>
-            Spell check applied
+            Проверка пройдена
           </v-chip>
           <v-chip
             v-if="taskMeta.spell_check_chunks_processed > 1"
@@ -77,8 +78,8 @@
         </v-col>
       </v-row>
 
-      <!-- <div>{{ this.taskMeta.corrected }}</div> -->
-      <!-- <div>{{ this.taskMeta.html_diff }}</div> -->
+      <!-- <div>{{ this.taskMeta.corrected }}</div>
+      <div>{{ this.taskMeta.html_diff }}</div> -->
 
       <v-row class="mt-4">
         <!-- condition class text-h5 -->
@@ -160,9 +161,8 @@
             color="white"
             variant="flat"
             @click="spellCheck"
-          >
-          
-          <!-- :disabled="isLoading || spellCheckInProgress || taskMeta.spell_check_success" -->
+            :disabled="isLoading || spellCheckInProgress || taskMeta.spell_check_success"
+          >         
             <v-progress-circular
               v-if="spellCheckInProgress"
               indeterminate
@@ -457,6 +457,12 @@ export default defineComponent({
       if (newVal) {
         this.renderMarkdown = false;
         this.showDiff = false;
+      }
+    },
+    renderMarkdown(newVal) {
+      if (newVal) {
+        this.showDiff = false;
+        this.showCorrected = false;
       }
     }
   },
