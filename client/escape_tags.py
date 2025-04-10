@@ -258,3 +258,17 @@ for domain in domains:
 # # %%
 
 # %%
+import json
+
+filename = f"./test_data/gemba_5_all_domains.json"
+texts = json.load(open(filename, "r", encoding="utf8"))
+
+texts = [escape_nonvalid_html_tags(x) for x in texts]
+
+json.dump(
+    texts,
+    open(filename.replace(".json", "_escaped.json"), "w", encoding="utf8"),
+    ensure_ascii=False,
+    indent=4,
+)
+# %%
