@@ -17,7 +17,7 @@
           density="compact"
           :disabled="showDiff"
         ></v-switch>
-        <v-switch
+        <!-- <v-switch
           v-if="taskMeta.spell_check_success"
           v-model="showDiff"
           color="primary"
@@ -26,8 +26,8 @@
           density="compact"
           class="mt-2"
           :disabled="renderMarkdown || showCorrected"
-        ></v-switch>
-        <v-switch
+        ></v-switch> -->
+        <!-- <v-switch
           v-if="taskMeta.spell_check_success"
           v-model="showCorrected"
           color="primary"
@@ -36,10 +36,10 @@
           density="compact"
           class="mt-2"
           :disabled="showDiff"
-        ></v-switch>
+        ></v-switch> -->
       </div>
 
-      <v-row v-if="taskMeta.spell_check_success" class="mt-4 mb-2">
+      <!-- <v-row v-if="taskMeta.spell_check_success" class="mt-4 mb-2">
         <v-col cols="12">
           <v-chip
             color="blue"
@@ -57,7 +57,7 @@
             {{ taskMeta.spell_check_chunks_processed }} chunks processed
           </v-chip>
         </v-col>
-      </v-row>
+      </v-row> -->
 
       <v-row v-if="showSpellCheck && taskMeta.spell_check_success" class="mt-1">
         <v-col cols="12">
@@ -157,7 +157,7 @@
             :disabled="isLoading"
             >🖊️ Пометить</v-btn
           >
-          <v-btn
+          <!-- <v-btn
             class="ml-8 btn-main btn-white"
             color="white"
             variant="flat"
@@ -173,7 +173,7 @@
               class="mr-2"
             ></v-progress-circular>
             ✅ Проверить
-          </v-btn>
+          </v-btn> -->
           <CommentDialog
             ref="commentDialog"
             v-model="showCommentDialog"
