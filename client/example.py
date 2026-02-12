@@ -1,156 +1,165 @@
-# %%
-# 1. read
+# %% 
+import json
+import time
+from pathlib import Path
 
 import src.gigametr as gm
-import json
+from escape_tags import escape_nonvalid_html_tags
 
 
-domains = ["krasota", "travel_creation", "synonims_list", "samopoznanie", "pretrain_hf"]
+ADDRESS = "localhost" 
+MODEL_NAME = "example"
+META_TEMPLATE = {"source_file": "example_source"}
 
-#%%
-for domain in domains:
-    input_file = f"./test_data/{domain}_questionable.json"
-    with open(
-        input_file,
-        "r",
-        encoding="utf8",
-    ) as fin:
-        # docs = [json.loads(x) for x in fin.read().splitlines()]
-        docs = json.load(fin)
-        texts = []
-        meta = []
-        raw_messages = []
 
-        for d in docs:
-            # d looks like [{'role': 'system', 'message_index': 0, 'trainable': False, 'content': nan} #nan is not string
-            acc, acc_raw = [], []
-            for m in d:
-                # Skip entries with missing, empty, or NaN content
-                if m["content"] is None or m["content"] == "" or m["content"] == "nan" or (isinstance(m["content"], float) and m["content"] != m["content"]):
-                    continue
-                if "trainable" in m:
-                    traniable_sign = " 🟢" if m["trainable"] else " 🔵"
-                    is_trainable = True if m["trainable"] else False
-                else:
-                    traniable_sign = ""
-                    is_trainable = False
-                acc.append(f"—{traniable_sign} [{m['role']}] {m['content']}")
-                acc_raw.append({"role": m["role"], "content": m["content"], "trainable": is_trainable})
+# %% 
+def _is_nan(x: object) -> bool:
+    return isinstance(x, float) and x != x
 
-            raw_messages.append(acc_raw)
-            text = "\n\n".join(acc)
-            texts.append(text)
 
-            meta.append({"source_file": f"{domain}"})
+def build_data_and_meta_from_raw(
+    *,
+    raw_path: Path,
+    data_out_path: Path,
+    meta_out_path: Path,
+    meta_template: dict,
+) -> None:
+    """
+    Builds `data_out_path` + `meta_out_path` from a single `raw_path`.
+
+    raw format: list[list[{"role": str, "content": str, "trainable": bool}]]
+    data format: list[str]
+    meta format: list[dict] of `meta_template`, len(meta) == len(raw)
+    """
+    raw_items = json.load(open(raw_path, "r", encoding="utf-8"))
+    if not isinstance(raw_items, list):
+        raise ValueError(f"Expected {raw_path} to contain a JSON list.")
+
+    texts: list[str] = []
+    for dialog in raw_items:
+        if not isinstance(dialog, list):
+            raise ValueError(
+                f"Expected each item in {raw_path} to be a list of messages."
+            )
+
+        acc: list[str] = []
+        for m in dialog:
+            if not isinstance(m, dict):
+                continue
+
+            content = m.get("content")
+            if content is None or content == "" or content == "nan" or _is_nan(content):
+                continue
+
+            role = m.get("role", "unknown")
+            if "trainable" in m:
+                trainable_sign = " 🟢" if m.get("trainable") else " 🔵"
+            else:
+                trainable_sign = ""
+
+            acc.append(f"—{trainable_sign} [{role}] {content}")
+
+        texts.append("\n\n".join(acc))
+
+    meta = [dict(meta_template) for _ in range(len(raw_items))]
 
     json.dump(
         texts,
-        open(f"./test_data/gemba_4_{domain}.json", "w", encoding="utf8"),
+        open(data_out_path, "w", encoding="utf-8"),
         ensure_ascii=False,
         indent=4,
     )
-
     json.dump(
         meta,
-        open(f"./test_data/gemba_4_{domain}_meta.json", "w", encoding="utf8"),
+        open(meta_out_path, "w", encoding="utf-8"),
         ensure_ascii=False,
         indent=4,
     )
+
+
+def escape_data_file(*, data_in_path: Path, data_out_path: Path) -> None:
+    texts = json.load(open(data_in_path, "r", encoding="utf-8"))
+    if not isinstance(texts, list) or (texts and not isinstance(texts[0], str)):
+        raise ValueError(f"Expected {data_in_path} to be a JSON list of strings.")
+
+    escaped = [escape_nonvalid_html_tags(t) for t in texts]
+    json.dump(
+        escaped,
+        open(data_out_path, "w", encoding="utf-8"),
+        ensure_ascii=False,
+        indent=4,
+    )
+
+
+# %% 
+def download_history(*, sbs_id: str, out_dir: Path, address: str) -> None:
+    """Downloads comments/actions history and saves JSON files."""
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    comments = gm.sbs.get_comments(sbs_guid=sbs_id, address=address)
+    actions = gm.sbs.get_actions(sbs_guid=sbs_id, address=address)
 
     json.dump(
-        raw_messages,
-        open(f"./test_data/gemba_4_{domain}_raw.json", "w", encoding="utf8"),
+        comments,
+        open(out_dir / f"comments_{sbs_id}.json", "w", encoding="utf-8"),
         ensure_ascii=False,
         indent=4,
     )
-
-
-#%%
-# 2. do escape html tags
-
-# %%
-# 3. upload
-
-import src.gigametr as gm
-import time
-
-for domain in domains[1:2]:
-    first_model = {
-        "name": f"{domain}",
-        "data": f"./test_data/gemba_4_{domain}_escaped.json",
-        "meta": f"./test_data/gemba_4_{domain}_meta.json",
-        "raw": f"./test_data/gemba_4_{domain}_raw.json",
-    }
-
-    res = gm.sbs.create(
-        name=f"Gemba 4. {domain}", first=first_model, address="localhost", type="single"
-        # name=f"Gemba 4. {domain}", first=first_model, address="gm.pp.ru", type="single"
-    )
-
-    print(f"\n\nhttp://gm.pp.ru/data/check/{res['id']}")
-    time.sleep(1)
-
-#["redactor", "krasota", "travel_creation", "synonims_list", "samopoznanie", "pretrain_hf"]
-
-# http://gm.pp.ru/data/check/4c9fa7a6124c4624be9ebdacbea36450
-# http://gm.pp.ru/data/check/a7dee7d534e342fd99467bd7cb92206e
-# http://gm.pp.ru/data/check/195a55e57aba4e9f9f7108fb8bee215a
-# http://gm.pp.ru/data/check/04404b87e85242f4ae9ee5be3c025d53
-# http://gm.pp.ru/data/check/ff9abf6da37a4cfd9648e62a8a0e7f50
-# http://gm.pp.ru/data/check/bbba2163b29a49bc90d6cce970a3c9a5
-
-# %%
-# http://localhost:5173/data/check/ddecfa51b13c40fc8c56e462d628b769
-
-
-#%%
-#download results
-
-import src.gigametr as gm
-import json
-import time
-
-
-domains = ["redactor", "krasota", "travel_creation", "synonims_list", "samopoznanie", "pretrain_hf"]
-guids = ['4c9fa7a6124c4624be9ebdacbea36450', 'a7dee7d534e342fd99467bd7cb92206e', '195a55e57aba4e9f9f7108fb8bee215a', '04404b87e85242f4ae9ee5be3c025d53', 'ff9abf6da37a4cfd9648e62a8a0e7f50', 'bbba2163b29a49bc90d6cce970a3c9a5']
-
-for domain, guid in zip(domains, guids):
-    sbs_guid = guid
-
-    #get comments
-    comments = gm.sbs.get_comments(sbs_guid=sbs_guid, address="gm.pp.ru")
-    comments_to_save = []
-    # leave last comment with same 'id'
-    for c in comments["data"][::-1]:
-        if c["id"] not in [x["id"] for x in comments_to_save]:
-            comments_to_save.append(c)
-    json.dump(
-        comments_to_save,
-        open(f"./comments_{domain}_{sbs_guid}.json", "w", encoding="utf-8"),
-        ensure_ascii=False,
-        indent=4,
-    )
-
-    #get actions
-    actions = gm.sbs.get_actions(sbs_guid=sbs_guid, address="gm.pp.ru")
-    actions = [
-        {"id": x["id"], "prompt": x["prompt_1"], "res": "Не база"}
-        for x in actions["data"]
-        if x["res"] == "both_bad"
-    ]
-    for a in actions:
-        c = [x for x in comments["data"] if x["id"] == a["id"]]
-        if c:
-            a["comment"] = c[0]["comment"]
     json.dump(
         actions,
-        open(f"./no_baza_{domain}_{sbs_guid}.json", "w", encoding="utf-8"),
+        open(out_dir / f"actions_{sbs_id}.json", "w", encoding="utf-8"),
         ensure_ascii=False,
         indent=4,
     )
 
-    time.sleep(1)
 
-# %%
-comments
+# %% 
+here = Path(__file__).resolve().parent
+test_data = here / "test_data"
+
+raw = test_data / "example_items_raw.json"
+
+data = test_data / "example_items.json"
+meta = test_data / "example_items_meta.json"
+escaped_data = test_data / "example_items_escaped.json"
+
+# 1) Preparation
+build_data_and_meta_from_raw(
+    raw_path=raw,
+    data_out_path=data,
+    meta_out_path=meta,
+    meta_template=META_TEMPLATE,
+)
+escape_data_file(data_in_path=data, data_out_path=escaped_data)
+print(f"Prepared upload files:\n- {escaped_data}\n- {meta}\n- {raw}")
+
+#%%
+
+# 2) Create
+first_model = {
+    "name": MODEL_NAME,
+    "data": str(escaped_data),
+    "meta": str(meta),
+    "raw": str(raw),
+}
+
+res = gm.sbs.create(
+    name="example_one",
+    first=first_model,
+    address=ADDRESS,
+    type="single",
+)
+print(res)
+
+sbs_id = res["id"]
+print(f"\nCheck UI: http://{ADDRESS}/data/check/{sbs_id}")
+time.sleep(1)
+
+#%%
+
+# 3) Download results: actions/comments history (may be empty if run isn't finished yet)
+out_dir = here / "results"
+download_history(sbs_id=sbs_id, out_dir=out_dir, address=ADDRESS)
+print(f"Saved history JSONs to: {out_dir}")
+
 # %%
